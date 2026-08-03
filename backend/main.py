@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+import re
 import database
 import models
 import schemas
@@ -25,6 +26,21 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def normalize_mesh_id(runtime_name: str) -> str:
+    """
+    Three.js renames GLB mesh nodes at runtime:
+      'r_scaphoid__0'  →  'r_scaphoid_beige_0'
+      'Cranium__0'     →  'Cranium_beige_0'
+    
+    This strips the material suffix back to the original GLB name.
+    Pattern: replace '_<material>_0' at end with '__0'.
+    """
+    # Try common Three.js material-suffix pattern: <name>_<material>_<index>
+    m = re.match(r'^(.+?)_[a-zA-Z]+_(\d+)$', runtime_name)
+    if m:
+        return f"{m.group(1)}__{m.group(2)}"
+    return runtime_name
 
 @app.on_event("startup")
 def seed_data():
@@ -56,8 +72,19 @@ def search_bones(q: str, db: Session = Depends(get_db)):
 
 @app.get("/api/bones/{mesh_id}", response_model=schemas.Bone)
 def get_bone(mesh_id: str, db: Session = Depends(get_db)):
-    """Fetch bone info by its exact mesh_id (e.g. 'l_femur__0')."""
+    """
+    Fetch bone info by mesh_id.
+    Tries exact match first, then normalizes the Three.js runtime name
+    (e.g. 'r_scaphoid_beige_0' → 'r_scaphoid__0') for a second lookup.
+    """
+    # 1. Exact match (fast path)
     bone = db.query(models.Bone).filter(models.Bone.mesh_id == mesh_id).first()
+
+    # 2. Normalized match (strip Three.js material suffix)
+    if not bone:
+        normalized = normalize_mesh_id(mesh_id)
+        if normalized != mesh_id:
+            bone = db.query(models.Bone).filter(models.Bone.mesh_id == normalized).first()
 
     if not bone:
         raise HTTPException(status_code=404, detail=f"No bone data found for mesh '{mesh_id}'")

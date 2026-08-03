@@ -324,7 +324,8 @@ export default function App() {
   // Format hovered mesh name for tooltip display
   const formatBoneName = (meshId: string) => {
     return meshId
-      .replace(/__0$/, '')
+      .replace(/_[a-zA-Z]+_0$/, '')  // Strip Three.js material suffix (e.g. _beige_0)
+      .replace(/__0$/, '')            // Strip original GLB suffix
       .replace(/_/g, ' ')
       .replace(/\b\w/g, c => c.toUpperCase())
       .replace(/^L\s/, 'Left ')
@@ -378,17 +379,29 @@ export default function App() {
             </React.Suspense>
 
             <OrbitControls
-              ref={controlsRef}
+              ref={(ref) => {
+                controlsRef.current = ref;
+                if (ref) {
+                  // Enable zoom-to-cursor: scroll zooms toward where your mouse points
+                  (ref as any).zoomToCursor = true;
+                }
+              }}
               makeDefault
               enablePan
-              panSpeed={0.8}
-              zoomSpeed={1.2}
-              minDistance={viewMode === 'skeleton' ? 0.15 : 0.05}
+              panSpeed={1.0}
+              zoomSpeed={1.5}
+              minDistance={viewMode === 'skeleton' ? 0.08 : 0.03}
               maxDistance={viewMode === 'skeleton' ? 8 : 10}
               minPolarAngle={0}
               maxPolarAngle={Math.PI}
               enableDamping
               dampingFactor={0.08}
+              // Right-click = pan, left-click = rotate, scroll = zoom
+              mouseButtons={{
+                LEFT: THREE.MOUSE.ROTATE,
+                MIDDLE: THREE.MOUSE.DOLLY,
+                RIGHT: THREE.MOUSE.PAN,
+              }}
             />
           </Canvas>
         </div>
