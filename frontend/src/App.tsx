@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Html, Environment, Bounds } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
@@ -52,10 +52,12 @@ function useBoneData(meshId: string | null) {
 
 function SkeletonModel({ 
   onBoneClick, 
-  selectedId 
+  selectedId,
+  onBoneHover,
 }: { 
   onBoneClick: (name: string) => void;
   selectedId: string | null;
+  onBoneHover: (name: string | null) => void;
 }) {
   const { scene } = useGLTF('/ct_derived_human_skeleton.glb');
   
@@ -109,9 +111,12 @@ function SkeletonModel({
       onPointerOver={(e: any) => {
         e.stopPropagation();
         document.body.style.cursor = 'pointer';
+        onBoneHover(e.object.name || null);
       }}
-      onPointerOut={() => {
+      onPointerOut={(e: any) => {
+        e.stopPropagation();
         document.body.style.cursor = 'auto';
+        onBoneHover(null);
       }}
     />
   );
@@ -132,9 +137,10 @@ function IsolatedBoneModel({ selectedId }: { selectedId: string }) {
     });
 
     const group = new THREE.Group();
-    if (targetMesh) {
-      const clonedMesh = targetMesh.clone();
-      clonedMesh.geometry = targetMesh.geometry.clone();
+    if (targetMesh !== null) {
+      const mesh = targetMesh as THREE.Mesh;
+      const clonedMesh = mesh.clone();
+      clonedMesh.geometry = mesh.geometry.clone();
       clonedMesh.geometry.center(); // Center the geometry locally
       clonedMesh.position.set(0, 0, 0);
       clonedMesh.rotation.set(0, 0, 0);
@@ -242,9 +248,11 @@ function InfoPanel({
 function SkeletonScene({
   selectedId,
   onBoneClick,
+  onBoneHover,
 }: {
   selectedId: string | null;
   onBoneClick: (id: string) => void;
+  onBoneHover: (name: string | null) => void;
 }) {
   return (
     <>
@@ -254,7 +262,7 @@ function SkeletonScene({
       <directionalLight position={[-3, 2, -3]} intensity={0.4} color="#4f6ef7" />
       <pointLight position={[0, 2, 2]} intensity={0.5} color="#60a5fa" />
 
-      <SkeletonModel onBoneClick={onBoneClick} selectedId={selectedId} />
+      <SkeletonModel onBoneClick={onBoneClick} selectedId={selectedId} onBoneHover={onBoneHover} />
     </>
   );
 }
@@ -282,6 +290,7 @@ function IsolatedScene({
 
 export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [hoveredBone, setHoveredBone] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'skeleton' | 'isolated'>('skeleton');
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const { state: fetchState, data: boneData } = useBoneData(selectedId);
@@ -296,84 +305,137 @@ export default function App() {
     setSelectedId(null);
   }, []);
 
+  const handleBoneHover = useCallback((name: string | null) => {
+    setHoveredBone(name);
+  }, []);
+
+  // Zoom controls for +/- buttons
+  const handleZoom = useCallback((direction: 'in' | 'out') => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    const factor = direction === 'in' ? 0.75 : 1.35;
+    const camera = controls.object as THREE.PerspectiveCamera;
+    const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+    offset.multiplyScalar(factor);
+    camera.position.copy(controls.target).add(offset);
+    controls.update();
+  }, []);
+
+  // Format hovered mesh name for tooltip display
+  const formatBoneName = (meshId: string) => {
+    return meshId
+      .replace(/__0$/, '')
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase())
+      .replace(/^L\s/, 'Left ')
+      .replace(/^R\s/, 'Right ');
+  };
+
   return (
     <div className="app-wrapper">
-      {/* 3D Canvas */}
-      <div className="canvas-layer">
-        <Canvas
-          shadows
-          camera={{ position: [0, 0.2, 3.5], fov: 45 }}
-          gl={{ antialias: true, alpha: false }}
-        >
-          <React.Suspense fallback={
-            <Html center>
-              <div style={{
-                background: 'rgba(5,10,20,0.9)',
-                border: '1px solid rgba(99,102,241,0.3)',
-                borderRadius: 12,
-                padding: '16px 28px',
-                color: '#a5b4fc',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: 14,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-              }}>
+      {/* Main Area: 3D Canvas + Header */}
+      <div className="main-area">
+        <div className="canvas-layer">
+          <Canvas
+            shadows
+            camera={{ position: [0, 0.2, 3.5], fov: 45, near: 0.001, far: 200 }}
+            gl={{ antialias: true, alpha: false }}
+          >
+            <React.Suspense fallback={
+              <Html center>
                 <div style={{
-                  width: 18, height: 18,
-                  border: '2px solid rgba(99,102,241,0.2)',
-                  borderTopColor: '#6366f1',
-                  borderRadius: '50%',
-                  animation: 'spin 0.7s linear infinite',
-                }} />
-                Loading 3D Model…
-              </div>
-            </Html>
-          }>
-            {viewMode === 'skeleton' ? (
-              <SkeletonScene
-                selectedId={selectedId}
-                onBoneClick={handleBoneClick}
-              />
-            ) : (
-              <IsolatedScene selectedId={selectedId!} />
-            )}
-          </React.Suspense>
+                  background: 'rgba(5,10,20,0.9)',
+                  border: '1px solid rgba(99,102,241,0.3)',
+                  borderRadius: 12,
+                  padding: '16px 28px',
+                  color: '#a5b4fc',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: 14,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}>
+                  <div style={{
+                    width: 18, height: 18,
+                    border: '2px solid rgba(99,102,241,0.2)',
+                    borderTopColor: '#6366f1',
+                    borderRadius: '50%',
+                    animation: 'spin 0.7s linear infinite',
+                  }} />
+                  Loading 3D Model…
+                </div>
+              </Html>
+            }>
+              {viewMode === 'skeleton' ? (
+                <SkeletonScene
+                  selectedId={selectedId}
+                  onBoneClick={handleBoneClick}
+                  onBoneHover={handleBoneHover}
+                />
+              ) : (
+                <IsolatedScene selectedId={selectedId!} />
+              )}
+            </React.Suspense>
 
-          <OrbitControls
-            ref={controlsRef}
-            makeDefault
-            enablePan={viewMode === 'isolated'}
-            minDistance={viewMode === 'skeleton' ? 2 : 0.05}
-            maxDistance={viewMode === 'skeleton' ? 7 : 10}
-            minPolarAngle={viewMode === 'skeleton' ? Math.PI * 0.1 : 0}
-            maxPolarAngle={viewMode === 'skeleton' ? Math.PI * 0.9 : Math.PI}
-          />
-        </Canvas>
+            <OrbitControls
+              ref={controlsRef}
+              makeDefault
+              enablePan
+              panSpeed={0.8}
+              zoomSpeed={1.2}
+              minDistance={viewMode === 'skeleton' ? 0.15 : 0.05}
+              maxDistance={viewMode === 'skeleton' ? 8 : 10}
+              minPolarAngle={0}
+              maxPolarAngle={Math.PI}
+              enableDamping
+              dampingFactor={0.08}
+            />
+          </Canvas>
+        </div>
+
+        {/* Hover tooltip that follows cursor */}
+        {hoveredBone && viewMode === 'skeleton' && (
+          <HoverTooltip boneName={formatBoneName(hoveredBone)} />
+        )}
+
+        {/* UI Overlay for Header */}
+        <div className="ui-layer">
+          <header className="app-header">
+            <div className="logo">
+              <div className="logo-icon">🦴</div>
+              <h1>Anatomy <span>Explorer</span></h1>
+            </div>
+            {viewMode === 'isolated' ? (
+              <button className="nav-pill active" onClick={handleBack} style={{ fontSize: '1rem', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>←</span> Back to Skeleton
+              </button>
+            ) : (
+              <nav className="nav-pills">
+                <button className="nav-pill active">Skeleton</button>
+                <button className="nav-pill" disabled title="Coming in Phase 3">Muscles</button>
+              </nav>
+            )}
+          </header>
+        </div>
+
+        {/* Zoom controls */}
+        <div className="zoom-controls">
+          <button className="zoom-btn" onClick={() => handleZoom('in')} title="Zoom in">+</button>
+          <button className="zoom-btn" onClick={() => handleZoom('out')} title="Zoom out">−</button>
+        </div>
+
+        {/* Zoom hint — skeleton mode only */}
+        {viewMode === 'skeleton' && !selectedId && (
+          <div className="zoom-hint">
+            <span className="zoom-hint-icon">🔍</span>
+            Scroll to zoom in · Click any bone · Right-drag to pan
+          </div>
+        )}
       </div>
 
-      {/* UI Overlay */}
-      <div className="ui-layer">
-        {/* Header */}
-        <header className="app-header">
-          <div className="logo">
-            <div className="logo-icon">🦴</div>
-            <h1>Anatomy <span>Explorer</span></h1>
-          </div>
-          {viewMode === 'isolated' ? (
-            <button className="nav-pill active" onClick={handleBack} style={{ fontSize: '1rem', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>←</span> Back to Skeleton
-            </button>
-          ) : (
-            <nav className="nav-pills">
-              <button className="nav-pill active">Skeleton</button>
-              <button className="nav-pill" disabled title="Coming in Phase 3">Muscles</button>
-            </nav>
-          )}
-        </header>
-
-        {/* Info panel — sits in the middle-right */}
-        <div className="panel-anchor">
+      {/* Side Panel */}
+      {selectedId && (
+        <div className="side-panel-area">
           <InfoPanel
             fetchState={fetchState}
             data={boneData}
@@ -381,8 +443,33 @@ export default function App() {
             onClose={handleBack}
           />
         </div>
+      )}
+    </div>
+  );
+}
 
-      </div>
+// ─── Hover tooltip ──────────────────────────────────────────────────────────
+
+function HoverTooltip({ boneName }: { boneName: string }) {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      setPos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handler);
+    return () => window.removeEventListener('mousemove', handler);
+  }, []);
+
+  return (
+    <div
+      className="bone-hover-tooltip"
+      style={{
+        left: pos.x + 14,
+        top: pos.y - 10,
+      }}
+    >
+      {boneName}
     </div>
   );
 }
