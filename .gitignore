@@ -1,0 +1,23 @@
+# Python / Backend
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+backend/.venv/
+.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
+test.db
+*.sqlite3
+
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# OS
+.DS_Store
+Thumbs.db
