@@ -27,22 +27,28 @@ models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Anatomy Explorer API", version="1.0.0")
 
-# Configure CORS for local development and hosted domains
+# Configure CORS for local development, hosted domains, and Vercel
 raw_origins = os.getenv("ALLOWED_ORIGINS", "*").strip()
-if raw_origins == "*" or not raw_origins:
-    origins = ["*"]
-    allow_credentials = False
-else:
-    origins = [orig.strip() for orig in raw_origins.split(",") if orig.strip()]
-    allow_credentials = True
+cleaned_origins = [orig.strip().strip('"').strip("'") for orig in raw_origins.split(",") if orig.strip()]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=allow_credentials,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if "*" in cleaned_origins or not cleaned_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_origin_regex=r".*",
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cleaned_origins,
+        allow_origin_regex=r"https://.*\.vercel\.app",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 def get_db():
     db = database.SessionLocal()
