@@ -560,3 +560,272 @@ body {
   font-size: 0.9rem;
   opacity: 0.6;
 }
+
+/* =============================================
+   Pan controls (D-pad)
+   ============================================= */
+.pan-controls {
+  position: absolute;
+  right: 20px;
+  bottom: 180px; /* Above the zoom controls */
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.pan-row {
+  display: flex;
+  gap: 4px;
+}
+
+.pan-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(5, 10, 25, 0.75);
+  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.pan-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.2);
+  transform: scale(1.08);
+}
+
+.pan-btn:active {
+  transform: scale(0.95);
+  background: rgba(99, 102, 241, 0.3);
+}
+
+
+/* =============================================
+   Search Bar (Side Panel)
+   ============================================= */
+.search-panel {
+  position: absolute;
+  top: 100px;
+  left: 24px;
+  width: 320px;
+  bottom: 24px;
+  background: rgba(5, 10, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+}
+
+.search-panel-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 16px 0;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  opacity: 0.6;
+}
+
+.search-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 10px 10px 10px 36px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  border-color: rgba(99, 102, 241, 0.6);
+  background: rgba(5, 10, 25, 0.8);
+}
+
+.search-results {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar styling */
+.search-results::-webkit-scrollbar {
+  width: 6px;
+}
+.search-results::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.search-result-item {
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.1s;
+}
+
+.search-result-item:hover {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.search-result-item.empty {
+  cursor: default;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  padding: 20px;
+}
+
+.search-result-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #e8edf5;
+}
+
+.search-result-system {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 2px;
+}
+
+/* =============================================
+   Quiz Panel
+   ============================================= */
+.quiz-panel {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 380px;
+  background: rgba(5, 10, 25, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
+}
+
+.quiz-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #a5b4fc;
+}
+
+.quiz-score {
+  font-weight: bold;
+  font-size: 1rem;
+  background: rgba(99, 102, 241, 0.2);
+  padding: 4px 12px;
+  border-radius: 100px;
+  color: #fff;
+}
+
+.quiz-prompt {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.quiz-target {
+  margin: 8px 0;
+  font-size: 1.6rem;
+  color: #fff;
+}
+
+.quiz-feedback {
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 8px;
+  border-radius: 8px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.quiz-feedback.correct {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.quiz-feedback.incorrect {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.quiz-footer {
+  display: flex;
+  gap: 10px;
+}
+
+.quiz-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quiz-btn.skip {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.quiz-btn.skip:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.quiz-btn.exit {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.quiz-btn.exit:hover {
+  background: rgba(239, 68, 68, 0.25);
+}

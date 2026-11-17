@@ -11,6 +11,8 @@ env.bak/
 venv.bak/
 test.db
 *.sqlite3
+*.db
+!backend/anatomy.db
 
 # Node / Frontend
 node_modules/

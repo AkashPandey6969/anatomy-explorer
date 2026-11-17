@@ -1,0 +1,565 @@
+
+=== GLTF Asset Info ===
+Version: 2.0 | Sketchfab-15.36.0
+Total nodes: 369
+Total meshes: 183
+Total materials: 1
+
+=== ALL MESHES ===
+  [0] "l cuboid__0" — 1 primitives
+  [1] "Cranium__0" — 1 primitives
+  [2] "Mandible__0" — 1 primitives
+  [3] "l_clavicle__0" — 1 primitives
+  [4] "c1__0" — 1 primitives
+  [5] "c2__0" — 1 primitives
+  [6] "c3__0" — 1 primitives
+  [7] "c4__0" — 1 primitives
+  [8] "c5__0" — 1 primitives
+  [9] "c6__0" — 1 primitives
+  [10] "r_clavicle__0" — 1 primitives
+  [11] "c7__0" — 1 primitives
+  [12] "l_humerus__0" — 1 primitives
+  [13] "l_radius__0" — 1 primitives
+  [14] "l_ulna__0" — 1 primitives
+  [15] "r_ulna__0" — 1 primitives
+  [16] "r_humerus__0" — 1 primitives
+  [17] "r_radius__0" — 1 primitives
+  [18] "Sternum__0" — 1 primitives
+  [19] "l1__0" — 1 primitives
+  [20] "l2__0" — 1 primitives
+  [21] "l3__0" — 1 primitives
+  [22] "l4__0" — 1 primitives
+  [23] "l_femur__0" — 1 primitives
+  [24] "l_tibia__0" — 1 primitives
+  [25] "l_fibula__0" — 1 primitives
+  [26] "r_tibia__0" — 1 primitives
+  [27] "r_fibula__0" — 1 primitives
+  [28] "l_rib1__0" — 1 primitives
+  [29] "r_rib1__0" — 1 primitives
+  [30] "t1__0" — 1 primitives
+  [31] "l_rib2__0" — 1 primitives
+  [32] "r_rib2__0" — 1 primitives
+  [33] "t2__0" — 1 primitives
+  [34] "l_rib3__0" — 1 primitives
+  [35] "r_rib3__0" — 1 primitives
+  [36] "t3__0" — 1 primitives
+  [37] "l_rib4__0" — 1 primitives
+  [38] "l_scapula__0" — 1 primitives
+  [39] "r_rib4__0" — 1 primitives
+  [40] "t4__0" — 1 primitives
+  [41] "l_rib5__0" — 1 primitives
+  [42] "r_rib5__0" — 1 primitives
+  [43] "t5__0" — 1 primitives
+  [44] "l_rib9__0" — 1 primitives
+  [45] "r_rib9__0" — 1 primitives
+  [46] "t6__0" — 1 primitives
+  [47] "t7__0" — 1 primitives
+  [48] "t8__0" — 1 primitives
+  [49] "t9__0" — 1 primitives
+  [50] "Xiphoid process__0" — 1 primitives
+  [51] "l_rib10__0" — 1 primitives
+  [52] "r_rib10__0" — 1 primitives
+  [53] "t10__0" — 1 primitives
+  [54] "l_rib11__0" — 1 primitives
+  [55] "r_rib11__0" — 1 primitives
+  [56] "t11__0" — 1 primitives
+  [57] "l_rib12__0" — 1 primitives
+  [58] "r_rib12__0" — 1 primitives
+  [59] "t12__0" — 1 primitives
+  [60] "r_femur__0" — 1 primitives
+  [61] "l5__0" — 1 primitives
+  [62] "Coccyx__0" — 1 primitives
+  [63] "r_talus__0" — 1 primitives
+  [64] "r_calcaneus__0" — 1 primitives
+  [65] "r_navicular__0" — 1 primitives
+  [66] "r_cuboid__0" — 1 primitives
+  [67] "r_lateral cuneiform__0" — 1 primitives
+  [68] "r_intermediate cuneiform__0" — 1 primitives
+  [69] "r_medial cuneiform__0" — 1 primitives
+  [70] "r_metatarsal 5__0" — 1 primitives
+  [71] "r_metatarsal 4__0" — 1 primitives
+  [72] "r_metatarsal 3__0" — 1 primitives
+  [73] "r_metatarsal 2__0" — 1 primitives
+  [74] "r_metatarsal 1__0" — 1 primitives
+  [75] "r_proximal phalange 5__0" — 1 primitives
+  [76] "r_intermediate phalange 5__0" — 1 primitives
+  [77] "r_distal phalange 5__0" — 1 primitives
+  [78] "sesamoids.001__0" — 1 primitives
+  [79] "r_proximal phalange 4__0" — 1 primitives
+  [80] "r_intermediate phalange 4__0" — 1 primitives
+  [81] "r_distal phalange 4__0" — 1 primitives
+  [82] "r_proximal phalange 3__0" — 1 primitives
+  [83] "r_intermediate phalange 3__0" — 1 primitives
+  [84] "r_distal phalange 3__0" — 1 primitives
+  [85] "r_proximal phalange 2__0" — 1 primitives
+  [86] "r_intermediate phalange 2__0" — 1 primitives
+  [87] "r_distal phalange 2__0" — 1 primitives
+  [88] "r_proximal phalange 1__0" — 1 primitives
+  [89] "r_distal phalange 1__0" — 1 primitives
+  [90] "r_distal phalange5__0" — 1 primitives
+  [91] "l_oscoxa__0" — 1 primitives
+  [92] "Sacrum__0" — 1 primitives
+  [93] "l distal phalange 1__0" — 1 primitives
+  [94] "l distal phalange 2__0" — 1 primitives
+  [95] "l distal phalange 3__0" — 1 primitives
+  [96] "l distal phalange 4__0" — 1 primitives
+  [97] "l distal phalange 5__0" — 1 primitives
+  [98] "l intermediate phalange 2__0" — 1 primitives
+  [99] "l intermediate phalange 3__0" — 1 primitives
+  [100] "l intermediate phalange 4__0" — 1 primitives
+  [101] "l interemediate phalange 5__0" — 1 primitives
+  [102] "l proximal phalange 1__0" — 1 primitives
+  [103] "l proximal phalange 2__0" — 1 primitives
+  [104] "l proximal phalange 3__0" — 1 primitives
+  [105] "l proximal phalange 4__0" — 1 primitives
+  [106] "l proximal phalange 5__0" — 1 primitives
+  [107] "l metatarsal 1__0" — 1 primitives
+  [108] "l metatarsal 2__0" — 1 primitives
+  [109] "l metatarsal 3__0" — 1 primitives
+  [110] "l metatarsal 4__0" — 1 primitives
+  [111] "l metatarsal 5__0" — 1 primitives
+  [112] "sesamoids__0" — 1 primitives
+  [113] "l calcaneus__0" — 1 primitives
+  [114] "l talus__0" — 1 primitives
+  [115] "l navicular__0" — 1 primitives
+  [116] "l medial cuneiform__0" — 1 primitives
+  [117] "l intermediate cuneiform__0" — 1 primitives
+  [118] "l lateral cuneiform__0" — 1 primitives
+  [119] "l_rib6__0" — 1 primitives
+  [120] "l_rib7__0" — 1 primitives
+  [121] "l_rib8__0" — 1 primitives
+  [122] "r_oscoxa__0" — 1 primitives
+  [123] "r_scapula__0" — 1 primitives
+  [124] "r_rib6__0" — 1 primitives
+  [125] "r_rib7__0" — 1 primitives
+  [126] "r_rib8__0" — 1 primitives
+  [127] "l_trapezium__0" — 1 primitives
+  [128] "r_trapezium__0" — 1 primitives
+  [129] "l_trapezoid__0" — 1 primitives
+  [130] "r_trapezoid__0" — 1 primitives
+  [131] "l_capitate__0" — 1 primitives
+  [132] "r_capitate__0" — 1 primitives
+  [133] "l_hamate__0" — 1 primitives
+  [134] "r_hamate__0" — 1 primitives
+  [135] "l_scaphoid__0" — 1 primitives
+  [136] "r_scaphoid__0" — 1 primitives
+  [137] "l_lunate__0" — 1 primitives
+  [138] "r_lunate__0" — 1 primitives
+  [139] "l_triquetral__0" — 1 primitives
+  [140] "r_triquetral__0" — 1 primitives
+  [141] "l_pisiform__0" — 1 primitives
+  [142] "r_pisiform__0" — 1 primitives
+  [143] "l_metacarpal1__0" — 1 primitives
+  [144] "l_metacarpal2__0" — 1 primitives
+  [145] "l_metacarpal3__0" — 1 primitives
+  [146] "l_metacarpal4__0" — 1 primitives
+  [147] "l_metacarpal5__0" — 1 primitives
+  [148] "l_proximal phalange1__0" — 1 primitives
+  [149] "l_distal phalange1__0" — 1 primitives
+  [150] "l_proximal phalange2__0" — 1 primitives
+  [151] "l_intermediate phalange2__0" — 1 primitives
+  [152] "l_distal phalange2__0" — 1 primitives
+  [153] "l_proximal phalange3__0" — 1 primitives
+  [154] "l_intermediate phalange3__0" — 1 primitives
+  [155] "l_distal phalange3__0" — 1 primitives
+  [156] "l_proximal phalange4__0" — 1 primitives
+  [157] "l_intermediate phalange4__0" — 1 primitives
+  [158] "l_distal phalange4__0" — 1 primitives
+  [159] "l_proximal phalange5__0" — 1 primitives
+  [160] "l_intermediate phalange5__0" — 1 primitives
+  [161] "l_distal phalange5__0" — 1 primitives
+  [162] "r_metacarpal1__0" — 1 primitives
+  [163] "r_metacarpal2__0" — 1 primitives
+  [164] "r_metacarpal3__0" — 1 primitives
+  [165] "r_metacarpal4__0" — 1 primitives
+  [166] "r_metacarpal5__0" — 1 primitives
+  [167] "r_proximal phalange1__0" — 1 primitives
+  [168] "r_distal phalange1__0" — 1 primitives
+  [169] "r_proximal phalange2__0" — 1 primitives
+  [170] "r_intermediate phalange2__0" — 1 primitives
+  [171] "r_distal phalange2__0" — 1 primitives
+  [172] "r_proximal phalange3__0" — 1 primitives
+  [173] "r_intermediate phalange3__0" — 1 primitives
+  [174] "r_distal phalange3__0" — 1 primitives
+  [175] "r_proximal phalange4__0" — 1 primitives
+  [176] "r_intermediate phalange4__0" — 1 primitives
+  [177] "r_distal phalange4__0" — 1 primitives
+  [178] "r_proximal phalange5__0" — 1 primitives
+  [179] "r_intermediate phalange5__0" — 1 primitives
+  [180] "l_patella__0" — 1 primitives
+  [181] "r_patella__0" — 1 primitives
+  [182] "hyoid__0" — 1 primitives
+
+=== ALL NODES ===
+  [0] "Sketchfab_model" 
+  [1] "41217dc1b0474f1dbbb764f1ac2c0b1f.fbx" 
+  [2] "RootNode" 
+  [3] "l cuboid" 
+  [4] "l cuboid__0" -> mesh: "l cuboid__0"
+  [5] "Cranium" 
+  [6] "Cranium__0" -> mesh: "Cranium__0"
+  [7] "Mandible" 
+  [8] "Mandible__0" -> mesh: "Mandible__0"
+  [9] "l_clavicle" 
+  [10] "l_clavicle__0" -> mesh: "l_clavicle__0"
+  [11] "c1" 
+  [12] "c1__0" -> mesh: "c1__0"
+  [13] "c2" 
+  [14] "c2__0" -> mesh: "c2__0"
+  [15] "c3" 
+  [16] "c3__0" -> mesh: "c3__0"
+  [17] "c4" 
+  [18] "c4__0" -> mesh: "c4__0"
+  [19] "c5" 
+  [20] "c5__0" -> mesh: "c5__0"
+  [21] "c6" 
+  [22] "c6__0" -> mesh: "c6__0"
+  [23] "r_clavicle" 
+  [24] "r_clavicle__0" -> mesh: "r_clavicle__0"
+  [25] "c7" 
+  [26] "c7__0" -> mesh: "c7__0"
+  [27] "l_humerus" 
+  [28] "l_humerus__0" -> mesh: "l_humerus__0"
+  [29] "l_radius" 
+  [30] "l_radius__0" -> mesh: "l_radius__0"
+  [31] "l_ulna" 
+  [32] "l_ulna__0" -> mesh: "l_ulna__0"
+  [33] "r_ulna" 
+  [34] "r_ulna__0" -> mesh: "r_ulna__0"
+  [35] "r_humerus" 
+  [36] "r_humerus__0" -> mesh: "r_humerus__0"
+  [37] "r_radius" 
+  [38] "r_radius__0" -> mesh: "r_radius__0"
+  [39] "Sternum" 
+  [40] "Sternum__0" -> mesh: "Sternum__0"
+  [41] "l1" 
+  [42] "l1__0" -> mesh: "l1__0"
+  [43] "l2" 
+  [44] "l2__0" -> mesh: "l2__0"
+  [45] "l3" 
+  [46] "l3__0" -> mesh: "l3__0"
+  [47] "l4" 
+  [48] "l4__0" -> mesh: "l4__0"
+  [49] "l_femur" 
+  [50] "l_femur__0" -> mesh: "l_femur__0"
+  [51] "l_tibia" 
+  [52] "l_tibia__0" -> mesh: "l_tibia__0"
+  [53] "l_fibula" 
+  [54] "l_fibula__0" -> mesh: "l_fibula__0"
+  [55] "r_tibia" 
+  [56] "r_tibia__0" -> mesh: "r_tibia__0"
+  [57] "r_fibula" 
+  [58] "r_fibula__0" -> mesh: "r_fibula__0"
+  [59] "l_rib1" 
+  [60] "l_rib1__0" -> mesh: "l_rib1__0"
+  [61] "r_rib1" 
+  [62] "r_rib1__0" -> mesh: "r_rib1__0"
+  [63] "t1" 
+  [64] "t1__0" -> mesh: "t1__0"
+  [65] "l_rib2" 
+  [66] "l_rib2__0" -> mesh: "l_rib2__0"
+  [67] "r_rib2" 
+  [68] "r_rib2__0" -> mesh: "r_rib2__0"
+  [69] "t2" 
+  [70] "t2__0" -> mesh: "t2__0"
+  [71] "l_rib3" 
+  [72] "l_rib3__0" -> mesh: "l_rib3__0"
+  [73] "r_rib3" 
+  [74] "r_rib3__0" -> mesh: "r_rib3__0"
+  [75] "t3" 
+  [76] "t3__0" -> mesh: "t3__0"
+  [77] "l_rib4" 
+  [78] "l_rib4__0" -> mesh: "l_rib4__0"
+  [79] "l_scapula" 
+  [80] "l_scapula__0" -> mesh: "l_scapula__0"
+  [81] "r_rib4" 
+  [82] "r_rib4__0" -> mesh: "r_rib4__0"
+  [83] "t4" 
+  [84] "t4__0" -> mesh: "t4__0"
+  [85] "l_rib5" 
+  [86] "l_rib5__0" -> mesh: "l_rib5__0"
+  [87] "r_rib5" 
+  [88] "r_rib5__0" -> mesh: "r_rib5__0"
+  [89] "t5" 
+  [90] "t5__0" -> mesh: "t5__0"
+  [91] "l_rib9" 
+  [92] "l_rib9__0" -> mesh: "l_rib9__0"
+  [93] "r_rib9" 
+  [94] "r_rib9__0" -> mesh: "r_rib9__0"
+  [95] "t6" 
+  [96] "t6__0" -> mesh: "t6__0"
+  [97] "t7" 
+  [98] "t7__0" -> mesh: "t7__0"
+  [99] "t8" 
+  [100] "t8__0" -> mesh: "t8__0"
+  [101] "t9" 
+  [102] "t9__0" -> mesh: "t9__0"
+  [103] "Xiphoid process" 
+  [104] "Xiphoid process__0" -> mesh: "Xiphoid process__0"
+  [105] "l_rib10" 
+  [106] "l_rib10__0" -> mesh: "l_rib10__0"
+  [107] "r_rib10" 
+  [108] "r_rib10__0" -> mesh: "r_rib10__0"
+  [109] "t10" 
+  [110] "t10__0" -> mesh: "t10__0"
+  [111] "l_rib11" 
+  [112] "l_rib11__0" -> mesh: "l_rib11__0"
+  [113] "r_rib11" 
+  [114] "r_rib11__0" -> mesh: "r_rib11__0"
+  [115] "t11" 
+  [116] "t11__0" -> mesh: "t11__0"
+  [117] "l_rib12" 
+  [118] "l_rib12__0" -> mesh: "l_rib12__0"
+  [119] "r_rib12" 
+  [120] "r_rib12__0" -> mesh: "r_rib12__0"
+  [121] "t12" 
+  [122] "t12__0" -> mesh: "t12__0"
+  [123] "r_femur" 
+  [124] "r_femur__0" -> mesh: "r_femur__0"
+  [125] "l5" 
+  [126] "l5__0" -> mesh: "l5__0"
+  [127] "Coccyx" 
+  [128] "Coccyx__0" -> mesh: "Coccyx__0"
+  [129] "r_talus" 
+  [130] "r_talus__0" -> mesh: "r_talus__0"
+  [131] "r_calcaneus" 
+  [132] "r_calcaneus__0" -> mesh: "r_calcaneus__0"
+  [133] "r_navicular" 
+  [134] "r_navicular__0" -> mesh: "r_navicular__0"
+  [135] "r_cuboid" 
+  [136] "r_cuboid__0" -> mesh: "r_cuboid__0"
+  [137] "r_lateral cuneiform" 
+  [138] "r_lateral cuneiform__0" -> mesh: "r_lateral cuneiform__0"
+  [139] "r_intermediate cuneiform" 
+  [140] "r_intermediate cuneiform__0" -> mesh: "r_intermediate cuneiform__0"
+  [141] "r_medial cuneiform" 
+  [142] "r_medial cuneiform__0" -> mesh: "r_medial cuneiform__0"
+  [143] "r_metatarsal 5" 
+  [144] "r_metatarsal 5__0" -> mesh: "r_metatarsal 5__0"
+  [145] "r_metatarsal 4" 
+  [146] "r_metatarsal 4__0" -> mesh: "r_metatarsal 4__0"
+  [147] "r_metatarsal 3" 
+  [148] "r_metatarsal 3__0" -> mesh: "r_metatarsal 3__0"
+  [149] "r_metatarsal 2" 
+  [150] "r_metatarsal 2__0" -> mesh: "r_metatarsal 2__0"
+  [151] "r_metatarsal 1" 
+  [152] "r_metatarsal 1__0" -> mesh: "r_metatarsal 1__0"
+  [153] "r_proximal phalange 5" 
+  [154] "r_proximal phalange 5__0" -> mesh: "r_proximal phalange 5__0"
+  [155] "r_intermediate phalange 5" 
+  [156] "r_intermediate phalange 5__0" -> mesh: "r_intermediate phalange 5__0"
+  [157] "r_distal phalange 5" 
+  [158] "r_distal phalange 5__0" -> mesh: "r_distal phalange 5__0"
+  [159] "sesamoids.001" 
+  [160] "sesamoids.001__0" -> mesh: "sesamoids.001__0"
+  [161] "r_proximal phalange 4" 
+  [162] "r_proximal phalange 4__0" -> mesh: "r_proximal phalange 4__0"
+  [163] "r_intermediate phalange 4" 
+  [164] "r_intermediate phalange 4__0" -> mesh: "r_intermediate phalange 4__0"
+  [165] "r_distal phalange 4" 
+  [166] "r_distal phalange 4__0" -> mesh: "r_distal phalange 4__0"
+  [167] "r_proximal phalange 3" 
+  [168] "r_proximal phalange 3__0" -> mesh: "r_proximal phalange 3__0"
+  [169] "r_intermediate phalange 3" 
+  [170] "r_intermediate phalange 3__0" -> mesh: "r_intermediate phalange 3__0"
+  [171] "r_distal phalange 3" 
+  [172] "r_distal phalange 3__0" -> mesh: "r_distal phalange 3__0"
+  [173] "r_proximal phalange 2" 
+  [174] "r_proximal phalange 2__0" -> mesh: "r_proximal phalange 2__0"
+  [175] "r_intermediate phalange 2" 
+  [176] "r_intermediate phalange 2__0" -> mesh: "r_intermediate phalange 2__0"
+  [177] "r_distal phalange 2" 
+  [178] "r_distal phalange 2__0" -> mesh: "r_distal phalange 2__0"
+  [179] "r_proximal phalange 1" 
+  [180] "r_proximal phalange 1__0" -> mesh: "r_proximal phalange 1__0"
+  [181] "r_distal phalange 1" 
+  [182] "r_distal phalange 1__0" -> mesh: "r_distal phalange 1__0"
+  [183] "r_distal phalange5" 
+  [184] "r_distal phalange5__0" -> mesh: "r_distal phalange5__0"
+  [185] "l_oscoxa" 
+  [186] "l_oscoxa__0" -> mesh: "l_oscoxa__0"
+  [187] "Sacrum" 
+  [188] "Sacrum__0" -> mesh: "Sacrum__0"
+  [189] "l distal phalange 1" 
+  [190] "l distal phalange 1__0" -> mesh: "l distal phalange 1__0"
+  [191] "l distal phalange 2" 
+  [192] "l distal phalange 2__0" -> mesh: "l distal phalange 2__0"
+  [193] "l distal phalange 3" 
+  [194] "l distal phalange 3__0" -> mesh: "l distal phalange 3__0"
+  [195] "l distal phalange 4" 
+  [196] "l distal phalange 4__0" -> mesh: "l distal phalange 4__0"
+  [197] "l distal phalange 5" 
+  [198] "l distal phalange 5__0" -> mesh: "l distal phalange 5__0"
+  [199] "l intermediate phalange 2" 
+  [200] "l intermediate phalange 2__0" -> mesh: "l intermediate phalange 2__0"
+  [201] "l intermediate phalange 3" 
+  [202] "l intermediate phalange 3__0" -> mesh: "l intermediate phalange 3__0"
+  [203] "l intermediate phalange 4" 
+  [204] "l intermediate phalange 4__0" -> mesh: "l intermediate phalange 4__0"
+  [205] "l interemediate phalange 5" 
+  [206] "l interemediate phalange 5__0" -> mesh: "l interemediate phalange 5__0"
+  [207] "l proximal phalange 1" 
+  [208] "l proximal phalange 1__0" -> mesh: "l proximal phalange 1__0"
+  [209] "l proximal phalange 2" 
+  [210] "l proximal phalange 2__0" -> mesh: "l proximal phalange 2__0"
+  [211] "l proximal phalange 3" 
+  [212] "l proximal phalange 3__0" -> mesh: "l proximal phalange 3__0"
+  [213] "l proximal phalange 4" 
+  [214] "l proximal phalange 4__0" -> mesh: "l proximal phalange 4__0"
+  [215] "l proximal phalange 5" 
+  [216] "l proximal phalange 5__0" -> mesh: "l proximal phalange 5__0"
+  [217] "l metatarsal 1" 
+  [218] "l metatarsal 1__0" -> mesh: "l metatarsal 1__0"
+  [219] "l metatarsal 2" 
+  [220] "l metatarsal 2__0" -> mesh: "l metatarsal 2__0"
+  [221] "l metatarsal 3" 
+  [222] "l metatarsal 3__0" -> mesh: "l metatarsal 3__0"
+  [223] "l metatarsal 4" 
+  [224] "l metatarsal 4__0" -> mesh: "l metatarsal 4__0"
+  [225] "l metatarsal 5" 
+  [226] "l metatarsal 5__0" -> mesh: "l metatarsal 5__0"
+  [227] "sesamoids" 
+  [228] "sesamoids__0" -> mesh: "sesamoids__0"
+  [229] "l calcaneus" 
+  [230] "l calcaneus__0" -> mesh: "l calcaneus__0"
+  [231] "l talus" 
+  [232] "l talus__0" -> mesh: "l talus__0"
+  [233] "l navicular" 
+  [234] "l navicular__0" -> mesh: "l navicular__0"
+  [235] "l medial cuneiform" 
+  [236] "l medial cuneiform__0" -> mesh: "l medial cuneiform__0"
+  [237] "l intermediate cuneiform" 
+  [238] "l intermediate cuneiform__0" -> mesh: "l intermediate cuneiform__0"
+  [239] "l lateral cuneiform" 
+  [240] "l lateral cuneiform__0" -> mesh: "l lateral cuneiform__0"
+  [241] "l_rib6" 
+  [242] "l_rib6__0" -> mesh: "l_rib6__0"
+  [243] "l_rib7" 
+  [244] "l_rib7__0" -> mesh: "l_rib7__0"
+  [245] "l_rib8" 
+  [246] "l_rib8__0" -> mesh: "l_rib8__0"
+  [247] "r_oscoxa" 
+  [248] "r_oscoxa__0" -> mesh: "r_oscoxa__0"
+  [249] "r_scapula" 
+  [250] "r_scapula__0" -> mesh: "r_scapula__0"
+  [251] "r_rib6" 
+  [252] "r_rib6__0" -> mesh: "r_rib6__0"
+  [253] "r_rib7" 
+  [254] "r_rib7__0" -> mesh: "r_rib7__0"
+  [255] "r_rib8" 
+  [256] "r_rib8__0" -> mesh: "r_rib8__0"
+  [257] "l_trapezium" 
+  [258] "l_trapezium__0" -> mesh: "l_trapezium__0"
+  [259] "r_trapezium" 
+  [260] "r_trapezium__0" -> mesh: "r_trapezium__0"
+  [261] "l_trapezoid" 
+  [262] "l_trapezoid__0" -> mesh: "l_trapezoid__0"
+  [263] "r_trapezoid" 
+  [264] "r_trapezoid__0" -> mesh: "r_trapezoid__0"
+  [265] "l_capitate" 
+  [266] "l_capitate__0" -> mesh: "l_capitate__0"
+  [267] "r_capitate" 
+  [268] "r_capitate__0" -> mesh: "r_capitate__0"
+  [269] "l_hamate" 
+  [270] "l_hamate__0" -> mesh: "l_hamate__0"
+  [271] "r_hamate" 
+  [272] "r_hamate__0" -> mesh: "r_hamate__0"
+  [273] "l_scaphoid" 
+  [274] "l_scaphoid__0" -> mesh: "l_scaphoid__0"
+  [275] "r_scaphoid" 
+  [276] "r_scaphoid__0" -> mesh: "r_scaphoid__0"
+  [277] "l_lunate" 
+  [278] "l_lunate__0" -> mesh: "l_lunate__0"
+  [279] "r_lunate" 
+  [280] "r_lunate__0" -> mesh: "r_lunate__0"
+  [281] "l_triquetral" 
+  [282] "l_triquetral__0" -> mesh: "l_triquetral__0"
+  [283] "r_triquetral" 
+  [284] "r_triquetral__0" -> mesh: "r_triquetral__0"
+  [285] "l_pisiform" 
+  [286] "l_pisiform__0" -> mesh: "l_pisiform__0"
+  [287] "r_pisiform" 
+  [288] "r_pisiform__0" -> mesh: "r_pisiform__0"
+  [289] "l_metacarpal1" 
+  [290] "l_metacarpal1__0" -> mesh: "l_metacarpal1__0"
+  [291] "l_metacarpal2" 
+  [292] "l_metacarpal2__0" -> mesh: "l_metacarpal2__0"
+  [293] "l_metacarpal3" 
+  [294] "l_metacarpal3__0" -> mesh: "l_metacarpal3__0"
+  [295] "l_metacarpal4" 
+  [296] "l_metacarpal4__0" -> mesh: "l_metacarpal4__0"
+  [297] "l_metacarpal5" 
+  [298] "l_metacarpal5__0" -> mesh: "l_metacarpal5__0"
+  [299] "l_proximal phalange1" 
+  [300] "l_proximal phalange1__0" -> mesh: "l_proximal phalange1__0"
+  [301] "l_distal phalange1" 
+  [302] "l_distal phalange1__0" -> mesh: "l_distal phalange1__0"
+  [303] "l_proximal phalange2" 
+  [304] "l_proximal phalange2__0" -> mesh: "l_proximal phalange2__0"
+  [305] "l_intermediate phalange2" 
+  [306] "l_intermediate phalange2__0" -> mesh: "l_intermediate phalange2__0"
+  [307] "l_distal phalange2" 
+  [308] "l_distal phalange2__0" -> mesh: "l_distal phalange2__0"
+  [309] "l_proximal phalange3" 
+  [310] "l_proximal phalange3__0" -> mesh: "l_proximal phalange3__0"
+  [311] "l_intermediate phalange3" 
+  [312] "l_intermediate phalange3__0" -> mesh: "l_intermediate phalange3__0"
+  [313] "l_distal phalange3" 
+  [314] "l_distal phalange3__0" -> mesh: "l_distal phalange3__0"
+  [315] "l_proximal phalange4" 
+  [316] "l_proximal phalange4__0" -> mesh: "l_proximal phalange4__0"
+  [317] "l_intermediate phalange4" 
+  [318] "l_intermediate phalange4__0" -> mesh: "l_intermediate phalange4__0"
+  [319] "l_distal phalange4" 
+  [320] "l_distal phalange4__0" -> mesh: "l_distal phalange4__0"
+  [321] "l_proximal phalange5" 
+  [322] "l_proximal phalange5__0" -> mesh: "l_proximal phalange5__0"
+  [323] "l_intermediate phalange5" 
+  [324] "l_intermediate phalange5__0" -> mesh: "l_intermediate phalange5__0"
+  [325] "l_distal phalange5" 
+  [326] "l_distal phalange5__0" -> mesh: "l_distal phalange5__0"
+  [327] "r_metacarpal1" 
+  [328] "r_metacarpal1__0" -> mesh: "r_metacarpal1__0"
+  [329] "r_metacarpal2" 
+  [330] "r_metacarpal2__0" -> mesh: "r_metacarpal2__0"
+  [331] "r_metacarpal3" 
+  [332] "r_metacarpal3__0" -> mesh: "r_metacarpal3__0"
+  [333] "r_metacarpal4" 
+  [334] "r_metacarpal4__0" -> mesh: "r_metacarpal4__0"
+  [335] "r_metacarpal5" 
+  [336] "r_metacarpal5__0" -> mesh: "r_metacarpal5__0"
+  [337] "r_proximal phalange1" 
+  [338] "r_proximal phalange1__0" -> mesh: "r_proximal phalange1__0"
+  [339] "r_distal phalange1" 
+  [340] "r_distal phalange1__0" -> mesh: "r_distal phalange1__0"
+  [341] "r_proximal phalange2" 
+  [342] "r_proximal phalange2__0" -> mesh: "r_proximal phalange2__0"
+  [343] "r_intermediate phalange2" 
+  [344] "r_intermediate phalange2__0" -> mesh: "r_intermediate phalange2__0"
+  [345] "r_distal phalange2" 
+  [346] "r_distal phalange2__0" -> mesh: "r_distal phalange2__0"
+  [347] "r_proximal phalange3" 
+  [348] "r_proximal phalange3__0" -> mesh: "r_proximal phalange3__0"
+  [349] "r_intermediate phalange3" 
+  [350] "r_intermediate phalange3__0" -> mesh: "r_intermediate phalange3__0"
+  [351] "r_distal phalange3" 
+  [352] "r_distal phalange3__0" -> mesh: "r_distal phalange3__0"
+  [353] "r_proximal phalange4" 
+  [354] "r_proximal phalange4__0" -> mesh: "r_proximal phalange4__0"
+  [355] "r_intermediate phalange4" 
+  [356] "r_intermediate phalange4__0" -> mesh: "r_intermediate phalange4__0"
+  [357] "r_distal phalange4" 
+  [358] "r_distal phalange4__0" -> mesh: "r_distal phalange4__0"
+  [359] "r_proximal phalange5" 
+  [360] "r_proximal phalange5__0" -> mesh: "r_proximal phalange5__0"
+  [361] "r_intermediate phalange5" 
+  [362] "r_intermediate phalange5__0" -> mesh: "r_intermediate phalange5__0"
+  [363] "l_patella" 
+  [364] "l_patella__0" -> mesh: "l_patella__0"
+  [365] "r_patella" 
+  [366] "r_patella__0" -> mesh: "r_patella__0"
+  [367] "hyoid" 
+  [368] "hyoid__0" -> mesh: "hyoid__0"
+
+=== MATERIALS ===
+  [0] "Scene_-_Root"

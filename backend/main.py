@@ -1,21 +1,45 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+import os
+import sys
 import re
-import database
-import models
-import schemas
 from typing import List
 
-# Create tables
+# Ensure backend directory is in python path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
+from sqlalchemy.orm import Session
+
+try:
+    import database
+    import models
+    import schemas
+    import seed_all_bones
+except ImportError:
+    from backend import database, models, schemas, seed_all_bones
+
+# Ensure database tables exist
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Anatomy Explorer API", version="1.0.0")
 
+# Configure CORS for local development and hosted domains
+raw_origins = os.getenv("ALLOWED_ORIGINS", "*").strip()
+if raw_origins == "*" or not raw_origins:
+    origins = ["*"]
+    allow_credentials = False
+else:
+    origins = [orig.strip() for orig in raw_origins.split(",") if orig.strip()]
+    allow_credentials = True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -36,21 +60,28 @@ def normalize_mesh_id(runtime_name: str) -> str:
     This strips the material suffix back to the original GLB name.
     Pattern: replace '_<material>_0' at end with '__0'.
     """
-    # Try common Three.js material-suffix pattern: <name>_<material>_<index>
     m = re.match(r'^(.+?)_[a-zA-Z]+_(\d+)$', runtime_name)
     if m:
         return f"{m.group(1)}__{m.group(2)}"
     return runtime_name
 
 @app.on_event("startup")
-def seed_data():
+def startup_event():
     db = database.SessionLocal()
-    count = db.query(models.Bone).count()
-    if count == 0:
-        print("[Seed] Database is empty. Please run seed_all_bones.py to populate it.")
-    else:
-        print(f"[Seed] Database has {count} bones loaded.")
-    db.close()
+    try:
+        count = db.query(models.Bone).count()
+        if count == 0:
+            print("[Startup] Database is empty. Attempting auto-seeding...")
+            try:
+                seed_all_bones.seed_all()
+                new_count = db.query(models.Bone).count()
+                print(f"[Startup] Successfully seeded {new_count} bones.")
+            except Exception as e:
+                print(f"[Startup] Auto-seeding error: {e}")
+        else:
+            print(f"[Startup] Database initialized with {count} bones.")
+    finally:
+        db.close()
 
 @app.get("/health")
 def health_check():
@@ -91,6 +122,37 @@ def get_bone(mesh_id: str, db: Session = Depends(get_db)):
 
     return bone
 
+# Serve frontend build if present (for single-service / Docker / full-stack deployments)
+frontend_dist_paths = [
+    os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"),
+    os.path.join(os.path.dirname(__file__), "static"),
+    os.path.join(os.getcwd(), "frontend", "dist"),
+    os.path.join(os.getcwd(), "dist"),
+]
+dist_dir = next((p for p in frontend_dist_paths if os.path.isdir(p)), None)
+
+if dist_dir:
+    assets_dir = os.path.join(dist_dir, "assets")
+    if os.path.isdir(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        if full_path == "health" or full_path.startswith(("api/", "docs", "openapi.json", "redoc")):
+            raise HTTPException(status_code=404, detail="Not Found")
+
+        file_path = os.path.join(dist_dir, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+
+        index_file = os.path.join(dist_dir, "index.html")
+        if os.path.isfile(index_file):
+            return FileResponse(index_file)
+
+        raise HTTPException(status_code=404, detail="Not Found")
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("PORT", 8000))
+    host = os.getenv("HOST", "0.0.0.0")
+    uvicorn.run("main:app", host=host, port=port, reload=False)

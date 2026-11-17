@@ -4,6 +4,7 @@ import { OrbitControls, useGLTF, Html, Environment, Bounds } from '@react-three/
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import './App.css';
+import { API_BASE_URL } from './config';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -31,7 +32,7 @@ function useBoneData(meshId: string | null) {
     setData(null);
 
     const controller = new AbortController();
-    fetch(`http://localhost:8000/api/bones/${encodeURIComponent(meshId)}`, {
+    fetch(`${API_BASE_URL}/api/bones/${encodeURIComponent(meshId)}`, {
       signal: controller.signal,
     })
       .then(res => {
@@ -53,10 +54,12 @@ function useBoneData(meshId: string | null) {
 function SkeletonModel({ 
   onBoneClick, 
   selectedId,
+  wrongId,
   onBoneHover,
 }: { 
   onBoneClick: (name: string) => void;
   selectedId: string | null;
+  wrongId?: string | null;
   onBoneHover: (name: string | null) => void;
 }) {
   const { scene } = useGLTF('/ct_derived_human_skeleton.glb');
@@ -87,9 +90,20 @@ function SkeletonModel({
         const mat = mesh.material as THREE.MeshStandardMaterial;
         const origColor = clonedScene.userData.originalMaterials.get(mesh.name);
         
-        if (selectedId && mesh.name === selectedId) {
-          mat.color.set('#f59e0b'); // Amber/Orange highlight
-          mat.emissive.set('#92400e');
+        const normalizedMeshName = mesh.name.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase();
+        const normalizedSelectedId = selectedId ? selectedId.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase() : null;
+        const normalizedWrongId = wrongId ? wrongId.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase() : null;
+        
+        const isSelected = selectedId && (mesh.name === selectedId || normalizedMeshName === normalizedSelectedId || mesh.name.replace(/_/g, ' ').toLowerCase().includes(normalizedSelectedId || ''));
+        const isWrong = wrongId && (mesh.name === wrongId || normalizedMeshName === normalizedWrongId || mesh.name.replace(/_/g, ' ').toLowerCase().includes(normalizedWrongId || ''));
+        
+        if (isSelected) {
+          mat.color.set('#22c55e'); // Green highlight
+          mat.emissive.set('#166534');
+          mat.emissiveIntensity = 0.5;
+        } else if (isWrong) {
+          mat.color.set('#ef4444'); // Red highlight
+          mat.emissive.set('#7f1d1d');
           mat.emissiveIntensity = 0.5;
         } else if (origColor) {
           mat.color.copy(origColor);
@@ -98,7 +112,7 @@ function SkeletonModel({
         }
       }
     });
-  }, [selectedId, clonedScene]);
+  }, [selectedId, wrongId, clonedScene]);
 
   return (
     <primitive 
@@ -130,11 +144,27 @@ function IsolatedBoneModel({ selectedId }: { selectedId: string }) {
   
   const isolatedGroup = React.useMemo(() => {
     let targetMesh: THREE.Mesh | null = null;
+    const normalizedSelectedId = selectedId.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase();
+
     scene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh && child.name === selectedId) {
-        targetMesh = child as THREE.Mesh;
+      if ((child as THREE.Mesh).isMesh) {
+        const normalizedChildName = child.name.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase();
+        if (child.name === selectedId || normalizedChildName === normalizedSelectedId || child.name.replace(/_/g, ' ').toLowerCase().includes(normalizedSelectedId)) {
+          console.log("MATCH FOUND:", child.name, "for selectedId:", selectedId);
+          targetMesh = child as THREE.Mesh;
+        }
       }
     });
+
+    if (!targetMesh) {
+      console.warn("NO MATCH FOUND FOR:", selectedId, "normalized as:", normalizedSelectedId);
+      // Just to debug, list a few mesh names to see what they look like
+      let sampleMeshes: string[] = [];
+      scene.traverse(c => {
+        if ((c as THREE.Mesh).isMesh && sampleMeshes.length < 5) sampleMeshes.push(c.name);
+      });
+      console.log("Sample meshes in scene:", sampleMeshes);
+    }
 
     const group = new THREE.Group();
     if (targetMesh !== null) {
@@ -243,14 +273,111 @@ function InfoPanel({
   return null;
 }
 
+
+// ─── Search and Quiz Components ───────────────────────────────────────────────
+
+function useAllBones() {
+  const [bones, setBones] = useState<BoneData[]>([]);
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/bones`)
+      .then(res => res.json())
+      .then(data => setBones(data))
+      .catch(err => console.error('Failed to fetch bones:', err));
+  }, []);
+  return bones;
+}
+
+function SearchBar({ bones, onSelect }: { bones: BoneData[], onSelect: (id: string) => void }) {
+  const [query, setQuery] = useState('');
+
+  const filtered = query.length > 0 ? bones.filter(b => 
+    b.common_name.toLowerCase().includes(query.toLowerCase()) || 
+    b.mesh_id.toLowerCase().includes(query.toLowerCase()) ||
+    (b.latin_name && b.latin_name.toLowerCase().includes(query.toLowerCase()))
+  ) : bones; // show all when empty
+
+  return (
+    <div className="search-panel">
+      <h3 className="search-panel-title">Explore Bones</h3>
+      <div className="search-input-wrapper">
+        <span className="search-icon">🔍</span>
+        <input 
+          type="text" 
+          placeholder="Search bones..." 
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          className="search-input"
+        />
+      </div>
+      <div className="search-results">
+        {filtered.length === 0 ? (
+          <div className="search-result-item empty">No results found</div>
+        ) : (
+          filtered.map(b => (
+            <div 
+              key={b.mesh_id} 
+              className="search-result-item"
+              onClick={() => {
+                onSelect(b.mesh_id);
+              }}
+            >
+              <div className="search-result-name">{b.common_name}</div>
+              <div className="search-result-system">{b.system || 'Skeletal System'}</div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function QuizPanel({
+  targetBone,
+  score,
+  onSkip,
+  onExit,
+  feedback
+}: {
+  targetBone: BoneData | null;
+  score: number;
+  onSkip: () => void;
+  onExit: () => void;
+  feedback: 'correct' | 'incorrect' | null;
+}) {
+  return (
+    <div className="quiz-panel">
+      <div className="quiz-header">
+        <h3>Quiz Mode</h3>
+        <div className="quiz-score">Score: {score}</div>
+      </div>
+      
+      <div className="quiz-body">
+        <p className="quiz-prompt">Find and click the:</p>
+        <h2 className="quiz-target">{targetBone?.common_name || '...'}</h2>
+        
+        {feedback === 'correct' && <div className="quiz-feedback correct">Correct! 🎉</div>}
+        {feedback === 'incorrect' && <div className="quiz-feedback incorrect">Try again! ❌</div>}
+      </div>
+
+      <div className="quiz-footer">
+        <button className="quiz-btn skip" onClick={onSkip}>Skip</button>
+        <button className="quiz-btn exit" onClick={onExit}>Exit Quiz</button>
+      </div>
+    </div>
+  );
+}
+
+
 // ─── Scene wrappers ─────────────
 
 function SkeletonScene({
   selectedId,
+  wrongId,
   onBoneClick,
   onBoneHover,
 }: {
   selectedId: string | null;
+  wrongId?: string | null;
   onBoneClick: (id: string) => void;
   onBoneHover: (name: string | null) => void;
 }) {
@@ -262,7 +389,7 @@ function SkeletonScene({
       <directionalLight position={[-3, 2, -3]} intensity={0.4} color="#4f6ef7" />
       <pointLight position={[0, 2, 2]} intensity={0.5} color="#60a5fa" />
 
-      <SkeletonModel onBoneClick={onBoneClick} selectedId={selectedId} onBoneHover={onBoneHover} />
+      <SkeletonModel onBoneClick={onBoneClick} selectedId={selectedId} wrongId={wrongId} onBoneHover={onBoneHover} />
     </>
   );
 }
@@ -291,18 +418,87 @@ function IsolatedScene({
 export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredBone, setHoveredBone] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'skeleton' | 'isolated'>('skeleton');
+  const [viewMode, setViewMode] = useState<'skeleton' | 'isolated' | 'quiz'>('skeleton');
+  const allBones = useAllBones();
+  const [quizTarget, setQuizTarget] = useState<BoneData | null>(null);
+  const [quizScore, setQuizScore] = useState(0);
+  const [quizFeedback, setQuizFeedback] = useState<'correct' | 'incorrect' | null>(null);
+  const [wrongClickId, setWrongClickId] = useState<string | null>(null);
+
+  const nextQuizQuestion = useCallback(() => {
+    if (allBones.length === 0) return;
+    const randomBone = allBones[Math.floor(Math.random() * allBones.length)];
+    setQuizTarget(randomBone);
+    setQuizFeedback(null);
+    setWrongClickId(null);
+  }, [allBones]);
+
+  const handleStartQuiz = useCallback(() => {
+    setViewMode('quiz');
+    setQuizScore(0);
+    setSelectedId(null);
+    nextQuizQuestion();
+  }, [nextQuizQuestion]);
+
+  const handleExitQuiz = useCallback(() => {
+    setViewMode('skeleton');
+    setQuizTarget(null);
+    setQuizFeedback(null);
+    setWrongClickId(null);
+  }, []);
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const { state: fetchState, data: boneData } = useBoneData(selectedId);
 
   const handleBoneClick = useCallback((id: string) => {
-    setSelectedId(id);
-    setViewMode('isolated');
-  }, []);
+    if (viewMode === 'quiz') {
+      if (!quizTarget || quizFeedback === 'correct') return;
+      
+      const normalizedId = id.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase();
+      const normalizedTarget = quizTarget.mesh_id.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase();
+      
+      const isCorrect = id === quizTarget.mesh_id || normalizedId === normalizedTarget || id.replace(/_/g, ' ').toLowerCase().includes(normalizedTarget);
+      
+      if (isCorrect) {
+        setQuizFeedback('correct');
+        setQuizScore(s => s + 1);
+        setWrongClickId(null);
+        setTimeout(() => {
+          nextQuizQuestion();
+        }, 1500);
+      } else {
+        setQuizFeedback('incorrect');
+        setWrongClickId(id);
+        setTimeout(() => {
+          setQuizFeedback(null);
+          setWrongClickId(null);
+        }, 1000);
+      }
+      return;
+    }
+
+    if (viewMode === 'skeleton') {
+      if (selectedId === id) {
+        setViewMode('isolated');
+      } else {
+        setSelectedId(id);
+      }
+    } else {
+      setSelectedId(id);
+      setViewMode('isolated');
+    }
+  }, [viewMode, quizTarget, nextQuizQuestion, quizFeedback, selectedId]);
 
   const handleBack = useCallback(() => {
     setViewMode('skeleton');
     setSelectedId(null);
+
+    if (controlsRef.current) {
+      const controls = controlsRef.current;
+      controls.target.set(0, 0, 0);
+      const camera = controls.object as THREE.PerspectiveCamera;
+      camera.position.set(0, 0.2, 3.5);
+      controls.update();
+    }
   }, []);
 
   const handleBoneHover = useCallback((name: string | null) => {
@@ -318,6 +514,46 @@ export default function App() {
     const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
     offset.multiplyScalar(factor);
     camera.position.copy(controls.target).add(offset);
+    controls.update();
+  }, []);
+
+  // Pan controls for D-pad buttons
+  const handlePan = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    const camera = controls.object as THREE.PerspectiveCamera;
+    
+    // Ensure the camera's matrixWorld is up to date
+    camera.updateMatrixWorld();
+    
+    // Calculate the right and up vectors from the camera
+    const right = new THREE.Vector3();
+    const up = new THREE.Vector3();
+    camera.matrixWorld.extractBasis(right, up, new THREE.Vector3());
+    
+    // Amount to pan based on distance to target
+    const distance = camera.position.distanceTo(controls.target);
+    const panAmount = Math.max(0.01, distance * 0.1); 
+    
+    const panOffset = new THREE.Vector3();
+    
+    switch (direction) {
+      case 'up':
+        panOffset.copy(up).multiplyScalar(panAmount);
+        break;
+      case 'down':
+        panOffset.copy(up).multiplyScalar(-panAmount);
+        break;
+      case 'left':
+        panOffset.copy(right).multiplyScalar(-panAmount);
+        break;
+      case 'right':
+        panOffset.copy(right).multiplyScalar(panAmount);
+        break;
+    }
+    
+    camera.position.add(panOffset);
+    controls.target.add(panOffset);
     controls.update();
   }, []);
 
@@ -367,9 +603,10 @@ export default function App() {
                 </div>
               </Html>
             }>
-              {viewMode === 'skeleton' ? (
+              {viewMode !== 'isolated' ? (
                 <SkeletonScene
-                  selectedId={selectedId}
+                  selectedId={viewMode === 'quiz' ? null : selectedId}
+                  wrongId={wrongClickId}
                   onBoneClick={handleBoneClick}
                   onBoneHover={handleBoneHover}
                 />
@@ -390,8 +627,8 @@ export default function App() {
               enablePan
               panSpeed={1.0}
               zoomSpeed={1.5}
-              minDistance={viewMode === 'skeleton' ? 0.08 : 0.03}
-              maxDistance={viewMode === 'skeleton' ? 8 : 10}
+              minDistance={viewMode !== 'isolated' ? 0.08 : 0.03}
+              maxDistance={viewMode !== 'isolated' ? 8 : 10}
               minPolarAngle={0}
               maxPolarAngle={Math.PI}
               enableDamping
@@ -405,6 +642,18 @@ export default function App() {
             />
           </Canvas>
         </div>
+
+        {viewMode !== 'isolated' && <SearchBar bones={allBones} onSelect={handleBoneClick} />}
+        
+        {viewMode === 'quiz' && (
+          <QuizPanel 
+            targetBone={quizTarget} 
+            score={quizScore} 
+            onSkip={nextQuizQuestion} 
+            onExit={handleExitQuiz}
+            feedback={quizFeedback}
+          />
+        )}
 
         {/* Hover tooltip that follows cursor */}
         {hoveredBone && viewMode === 'skeleton' && (
@@ -424,7 +673,8 @@ export default function App() {
               </button>
             ) : (
               <nav className="nav-pills">
-                <button className="nav-pill active">Skeleton</button>
+                <button className={`nav-pill ${viewMode === 'skeleton' ? 'active' : ''}`} onClick={handleExitQuiz}>Skeleton</button>
+                <button className={`nav-pill ${viewMode === 'quiz' ? 'active' : ''}`} onClick={handleStartQuiz} disabled={allBones.length === 0}>Quiz</button>
                 <button className="nav-pill" disabled title="Coming in Phase 3">Muscles</button>
               </nav>
             )}
@@ -437,8 +687,18 @@ export default function App() {
           <button className="zoom-btn" onClick={() => handleZoom('out')} title="Zoom out">−</button>
         </div>
 
+        {/* Pan controls */}
+        <div className="pan-controls">
+          <button className="pan-btn up" onClick={() => handlePan('up')} title="Pan Up">↑</button>
+          <div className="pan-row">
+            <button className="pan-btn left" onClick={() => handlePan('left')} title="Pan Left">←</button>
+            <button className="pan-btn down" onClick={() => handlePan('down')} title="Pan Down">↓</button>
+            <button className="pan-btn right" onClick={() => handlePan('right')} title="Pan Right">→</button>
+          </div>
+        </div>
+
         {/* Zoom hint — skeleton mode only */}
-        {viewMode === 'skeleton' && !selectedId && (
+        {(viewMode === 'skeleton' || viewMode === 'quiz') && !selectedId && (
           <div className="zoom-hint">
             <span className="zoom-hint-icon">🔍</span>
             Scroll to zoom in · Click any bone · Right-drag to pan
