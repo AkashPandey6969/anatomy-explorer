@@ -240,6 +240,7 @@ function InfoPanel({
   data,
   selectedId,
   onClose,
+  onCollapse,
   onInspect3D,
   viewMode,
 }: {
@@ -247,6 +248,7 @@ function InfoPanel({
   data: BoneData | null;
   selectedId: string | null;
   onClose: () => void;
+  onCollapse?: () => void;
   onInspect3D: () => void;
   viewMode: 'skeleton' | 'isolated' | 'quiz';
 }) {
@@ -269,7 +271,28 @@ function InfoPanel({
     return (
       <div className="info-panel">
         <div className="panel-not-found" style={{ position: 'relative' }}>
-          <button className="panel-close-btn" onClick={onClose} title="Close">✕</button>
+          <div className="panel-header-actions">
+            {onCollapse && (
+              <button 
+                type="button" 
+                className="panel-collapse-btn" 
+                onClick={onCollapse} 
+                title="Hide details (drag down)"
+                aria-label="Hide details"
+              >
+                ▼
+              </button>
+            )}
+            <button 
+              type="button" 
+              className="panel-close-btn" 
+              onClick={onClose} 
+              title="Close panel"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
           <div className="not-found-icon">🔍</div>
           <div className="not-found-title">No data for this bone yet</div>
           <div className="not-found-mesh">Mesh ID: {selectedId}</div>
@@ -286,7 +309,28 @@ function InfoPanel({
     return (
       <div className="info-panel">
         <div className="panel-header" style={{ position: 'relative' }}>
-          <button className="panel-close-btn" onClick={onClose} title="Close panel">✕</button>
+          <div className="panel-header-actions">
+            {onCollapse && (
+              <button 
+                type="button" 
+                className="panel-collapse-btn" 
+                onClick={onCollapse} 
+                title="Hide details (drag down)"
+                aria-label="Hide details"
+              >
+                ▼
+              </button>
+            )}
+            <button 
+              type="button" 
+              className="panel-close-btn" 
+              onClick={onClose} 
+              title="Close panel"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
           <div className="panel-system-tag">
             🦴 {data.system || 'Skeletal System'}
           </div>
@@ -496,6 +540,78 @@ export default function App() {
   const [quizFeedback, setQuizFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [wrongClickId, setWrongClickId] = useState<string | null>(null);
 
+  // Hideable / collapsible detail panel states and drag gesture
+  const [isDetailCollapsed, setIsDetailCollapsed] = useState(false);
+  const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const startYRef = useRef(0);
+  const collapsedStartYRef = useRef(0);
+
+  useEffect(() => {
+    if (selectedId) {
+      setIsDetailCollapsed(false);
+      setDragY(0);
+    }
+  }, [selectedId]);
+
+  const handleDragStart = useCallback((e: React.PointerEvent) => {
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {}
+    startYRef.current = e.clientY;
+    setIsDragging(true);
+  }, []);
+
+  const handleDragMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    const deltaY = e.clientY - startYRef.current;
+    if (deltaY > 0) {
+      setDragY(deltaY);
+    } else {
+      setDragY(deltaY * 0.15);
+    }
+  }, [isDragging]);
+
+  const handleDragEnd = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+    setIsDragging(false);
+    const deltaY = e.clientY - startYRef.current;
+    if (deltaY > 50) {
+      setIsDetailCollapsed(true);
+    }
+    setDragY(0);
+  }, [isDragging]);
+
+  const handleDragCancel = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+    setIsDragging(false);
+    setDragY(0);
+  }, [isDragging]);
+
+  const handleCollapsedPointerDown = useCallback((e: React.PointerEvent) => {
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {}
+    collapsedStartYRef.current = e.clientY;
+  }, []);
+
+  const handleCollapsedPointerUp = useCallback((e: React.PointerEvent) => {
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+    const deltaY = e.clientY - collapsedStartYRef.current;
+    // Tapping or swiping up expands it
+    if (deltaY < -15 || Math.abs(deltaY) < 12) {
+      setIsDetailCollapsed(false);
+    }
+  }, []);
+
   const nextQuizQuestion = useCallback(() => {
     if (allBones.length === 0) return;
     const randomBone = allBones[Math.floor(Math.random() * allBones.length)];
@@ -549,6 +665,7 @@ export default function App() {
 
     // Normal exploration: simply select the bone
     setSelectedId(id);
+    setIsDetailCollapsed(false);
   }, [viewMode, quizTarget, nextQuizQuestion, quizFeedback]);
 
   const handleInspect3D = useCallback(() => {
@@ -570,6 +687,7 @@ export default function App() {
 
   const handleClosePanel = useCallback(() => {
     setSelectedId(null);
+    setIsDetailCollapsed(false);
     if (viewMode === 'isolated') {
       setViewMode('skeleton');
     }
@@ -824,17 +942,98 @@ export default function App() {
         )}
       </div>
 
-      {/* Side Panel */}
-      {selectedId && (
-        <div className="side-panel-area">
+      {/* Side Panel / Bottom Sheet (Hideable / Draggable) */}
+      {selectedId && !isDetailCollapsed && (
+        <div 
+          className="side-panel-area"
+          style={{
+            transform: isDragging && dragY > 0 ? `translateY(${dragY}px)` : undefined,
+            transition: isDragging ? 'none' : 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+        >
+          {/* Drag Handle & Collapse Bar */}
+          <div 
+            className="drawer-drag-header"
+            onPointerDown={handleDragStart}
+            onPointerMove={handleDragMove}
+            onPointerUp={handleDragEnd}
+            onPointerCancel={handleDragCancel}
+            onClick={() => {
+              if (dragY === 0) setIsDetailCollapsed(true);
+            }}
+            title="Drag down or tap to hide details"
+          >
+            <div className="drawer-drag-pill" />
+            <div className="drawer-drag-row">
+              <span className="drawer-drag-hint">▼ Drag down or tap to hide</span>
+              <button 
+                type="button" 
+                className="drawer-collapse-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDetailCollapsed(true);
+                }}
+                title="Hide details"
+              >
+                ▼ Hide
+              </button>
+            </div>
+          </div>
+
           <InfoPanel
             fetchState={fetchState}
             data={boneData}
             selectedId={selectedId}
             onClose={handleClosePanel}
+            onCollapse={() => setIsDetailCollapsed(true)}
             onInspect3D={handleInspect3D}
             viewMode={viewMode}
           />
+        </div>
+      )}
+
+      {/* Collapsed Floating Mini Bar (when detail is hidden) */}
+      {selectedId && isDetailCollapsed && (
+        <div 
+          className="detail-collapsed-bar"
+          onPointerDown={handleCollapsedPointerDown}
+          onPointerUp={handleCollapsedPointerUp}
+          title="Drag up or tap to view details"
+        >
+          <div className="collapsed-bar-handle" />
+          <div className="collapsed-bar-content">
+            <div className="collapsed-bar-info">
+              <span className="collapsed-bar-icon">🦴</span>
+              <span className="collapsed-bar-title">{boneData?.common_name || formatBoneName(selectedId)}</span>
+              {boneData?.nepali_name && (
+                <span className="collapsed-bar-nepali">{boneData.nepali_name}</span>
+              )}
+            </div>
+            <div className="collapsed-bar-actions">
+              <button 
+                type="button"
+                className="collapsed-expand-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDetailCollapsed(false);
+                }}
+                title="View bone details"
+              >
+                ▲ Details
+              </button>
+              <button 
+                type="button"
+                className="collapsed-close-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClosePanel();
+                }}
+                title="Deselect bone"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

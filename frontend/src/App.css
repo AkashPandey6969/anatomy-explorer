@@ -321,10 +321,18 @@ body {
   letter-spacing: 0.02em;
 }
 
-.panel-close-btn {
+.panel-header-actions {
   position: absolute;
   top: 16px;
   right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+.panel-collapse-btn,
+.panel-close-btn {
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -337,7 +345,13 @@ body {
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
-  z-index: 10;
+}
+
+.panel-collapse-btn:hover {
+  background: rgba(99, 102, 241, 0.3);
+  border-color: rgba(99, 102, 241, 0.6);
+  color: #c7d2fe;
+  transform: scale(1.08);
 }
 
 .panel-close-btn:hover {
@@ -345,6 +359,214 @@ body {
   border-color: rgba(239, 68, 68, 0.5);
   color: #fca5a5;
   transform: scale(1.08);
+}
+
+/* =============================================
+   Drawer Drag Header (Top of Side/Bottom Panel)
+   ============================================= */
+.drawer-drag-header {
+  width: 100%;
+  padding: 6px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 8px;
+}
+
+.drawer-drag-header:active {
+  cursor: grabbing;
+}
+
+.drawer-drag-pill {
+  width: 44px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.drawer-drag-header:hover .drawer-drag-pill {
+  background: rgba(99, 102, 241, 0.85);
+  width: 54px;
+}
+
+.drawer-drag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.drawer-drag-hint {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.drawer-collapse-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #c7d2fe;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.drawer-collapse-btn:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.5);
+  color: #ffffff;
+}
+
+/* =============================================
+   Detail Collapsed Bar (Hideable Floating State)
+   ============================================= */
+.detail-collapsed-bar {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  background: rgba(5, 10, 25, 0.94);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(99, 102, 241, 0.45);
+  border-radius: 16px;
+  padding: 8px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 75;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.65), 0 0 20px rgba(99, 102, 241, 0.25);
+  cursor: pointer;
+  animation: slideUpBottom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  touch-action: none;
+}
+
+.detail-collapsed-bar:hover {
+  border-color: rgba(99, 102, 241, 0.85);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), 0 0 24px rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+}
+
+.collapsed-bar-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 0 auto 2px;
+  transition: all 0.2s ease;
+}
+
+.detail-collapsed-bar:hover .collapsed-bar-handle {
+  background: rgba(99, 102, 241, 0.7);
+  width: 44px;
+}
+
+.collapsed-bar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.collapsed-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.collapsed-bar-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.collapsed-bar-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collapsed-bar-nepali {
+  font-size: 0.75rem;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  padding: 1px 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.collapsed-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.collapsed-expand-btn {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.5);
+  color: #c7d2fe;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.collapsed-expand-btn:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.5) 0%, rgba(59, 130, 246, 0.5) 100%);
+  border-color: rgba(99, 102, 241, 0.8);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+}
+
+.collapsed-close-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.collapsed-close-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
 }
 
 .inspect-bone-btn {
@@ -1193,21 +1415,20 @@ body {
     border-radius: 20px 20px 0 0;
     z-index: 70;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.75);
-    padding: 12px 16px 24px;
+    padding: 6px 14px 20px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     animation: slideUpBottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .side-panel-area::before {
-    content: '';
-    display: block;
-    width: 40px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.25);
-    border-radius: 2px;
-    margin: 0 auto 10px;
-    flex-shrink: 0;
+  .detail-collapsed-bar {
+    left: 12px;
+    right: 12px;
+    bottom: 14px;
+    width: auto;
+    max-width: none;
+    padding: 7px 12px 9px;
+    border-radius: 14px;
   }
 
   .info-panel {
