@@ -344,6 +344,7 @@ function useAllBones() {
 
 function SearchBar({ bones, onSelect }: { bones: BoneData[], onSelect: (id: string) => void }) {
   const [query, setQuery] = useState('');
+  const [isOpenMobile, setIsOpenMobile] = useState(false);
 
   const filtered = query.length > 0 ? bones.filter(b => 
     b.common_name.toLowerCase().includes(query.toLowerCase()) || 
@@ -352,37 +353,60 @@ function SearchBar({ bones, onSelect }: { bones: BoneData[], onSelect: (id: stri
   ) : bones; // show all when empty
 
   return (
-    <div className="search-panel">
-      <h3 className="search-panel-title">Explore Bones</h3>
-      <div className="search-input-wrapper">
-        <span className="search-icon">🔍</span>
-        <input 
-          type="text" 
-          placeholder="Search bones..." 
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          className="search-input"
-        />
+    <>
+      <button 
+        type="button"
+        className="mobile-search-toggle" 
+        onClick={() => setIsOpenMobile(prev => !prev)}
+        aria-label="Search bones"
+      >
+        <span>🔍</span>
+        <span className="mobile-search-text">Search Bones</span>
+      </button>
+
+      <div className={`search-panel ${isOpenMobile ? 'mobile-open' : ''}`}>
+        <div className="search-panel-header">
+          <h3 className="search-panel-title">Explore Bones</h3>
+          <button 
+            type="button"
+            className="search-close-mobile-btn" 
+            onClick={() => setIsOpenMobile(false)}
+            aria-label="Close search"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="search-input-wrapper">
+          <span className="search-icon">🔍</span>
+          <input 
+            type="text" 
+            placeholder="Search bones..." 
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        <div className="search-results">
+          {filtered.length === 0 ? (
+            <div className="search-result-item empty">No results found</div>
+          ) : (
+            filtered.map(b => (
+              <div 
+                key={b.mesh_id} 
+                className="search-result-item"
+                onClick={() => {
+                  onSelect(b.mesh_id);
+                  setIsOpenMobile(false);
+                }}
+              >
+                <div className="search-result-name">{b.common_name}</div>
+                <div className="search-result-system">{b.system || 'Skeletal System'}</div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
-      <div className="search-results">
-        {filtered.length === 0 ? (
-          <div className="search-result-item empty">No results found</div>
-        ) : (
-          filtered.map(b => (
-            <div 
-              key={b.mesh_id} 
-              className="search-result-item"
-              onClick={() => {
-                onSelect(b.mesh_id);
-              }}
-            >
-              <div className="search-result-name">{b.common_name}</div>
-              <div className="search-result-system">{b.system || 'Skeletal System'}</div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 

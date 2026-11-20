@@ -758,8 +758,43 @@ body {
 
 
 /* =============================================
-   Search Bar (Side Panel)
+   Search Bar (Side Panel & Mobile Toggle)
    ============================================= */
+.mobile-search-toggle {
+  display: none;
+  border: none;
+  outline: none;
+}
+
+.search-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.search-close-mobile-btn {
+  display: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.75);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.search-close-mobile-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
 .search-panel {
   position: absolute;
   top: 100px;
@@ -781,7 +816,7 @@ body {
   font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
-  margin: 0 0 16px 0;
+  margin: 0;
 }
 
 .search-input-wrapper {
@@ -973,4 +1008,329 @@ body {
 
 .quiz-btn.exit:hover {
   background: rgba(239, 68, 68, 0.25);
+}
+
+/* =============================================
+   Responsive Design (Laptop & Mobile Optimization)
+   ============================================= */
+
+@keyframes slideUpBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Touch devices: hide hover tooltips */
+@media (hover: none) {
+  .bone-hover-tooltip {
+    display: none !important;
+  }
+}
+
+/* Standard Laptops & Medium Screens (<= 1200px) */
+@media (max-width: 1200px) {
+  .side-panel-area {
+    width: 340px;
+    padding: 20px 16px;
+  }
+
+  .search-panel {
+    width: 270px;
+    left: 16px;
+    top: 90px;
+    bottom: 20px;
+  }
+
+  .panel-bone-name {
+    font-size: 1.35rem;
+  }
+
+  .pan-controls {
+    right: 16px;
+    bottom: 160px;
+  }
+
+  .zoom-controls {
+    right: 16px;
+    bottom: 70px;
+  }
+
+  .pan-btn, .zoom-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+}
+
+/* Compact Laptops & Tablets (<= 992px) */
+@media (max-width: 992px) {
+  .side-panel-area {
+    width: 310px;
+    padding: 16px 14px;
+  }
+
+  .search-panel {
+    width: 250px;
+    left: 14px;
+    top: 80px;
+    bottom: 16px;
+    padding: 14px;
+  }
+
+  .ui-layer {
+    padding: 18px;
+  }
+
+  .logo h1 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Mobile Screens (<= 768px) */
+@media (max-width: 768px) {
+  .app-wrapper {
+    height: 100dvh;
+    width: 100vw;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ui-layer {
+    padding: 12px 14px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+
+  .logo h1 {
+    font-size: 1.1rem;
+  }
+
+  .nav-pills {
+    gap: 4px;
+    padding: 3px;
+  }
+
+  .nav-pill {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    border-radius: 6px;
+  }
+
+  /* Mobile Search Toggle Button */
+  .mobile-search-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    position: absolute;
+    top: 64px;
+    left: 14px;
+    z-index: 25;
+    background: rgba(5, 10, 25, 0.88);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    color: #c7d2fe;
+    padding: 7px 14px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
+  }
+
+  .mobile-search-toggle:active {
+    background: rgba(99, 102, 241, 0.35);
+    transform: scale(0.96);
+  }
+
+  /* Search Panel as Mobile Modal Overlay */
+  .search-panel {
+    position: fixed;
+    top: 56px;
+    left: 12px;
+    right: 12px;
+    bottom: 16px;
+    width: auto;
+    z-index: 85;
+    border-radius: 18px;
+    transform: translateY(120%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.85);
+  }
+
+  .search-panel.mobile-open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .search-close-mobile-btn {
+    display: flex;
+  }
+
+  /* Side Panel Transforms into Bottom Sheet Drawer on Mobile */
+  .side-panel-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    max-height: 55vh;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px 20px 0 0;
+    z-index: 70;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.75);
+    padding: 12px 16px 24px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    animation: slideUpBottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .side-panel-area::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    margin: 0 auto 10px;
+    flex-shrink: 0;
+  }
+
+  .info-panel {
+    border-radius: 14px;
+  }
+
+  .panel-header {
+    padding: 14px 16px 12px;
+  }
+
+  .panel-bone-name {
+    font-size: 1.25rem;
+  }
+
+  .panel-body {
+    padding: 12px 16px;
+  }
+
+  .inspect-bone-btn {
+    padding: 10px 14px;
+    font-size: 0.84rem;
+  }
+
+  /* 3D Isolated Mode Banner on Mobile */
+  .isolated-mode-banner {
+    top: 60px;
+    left: 10px;
+    right: 10px;
+    max-width: none;
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+
+  .isolated-banner-title {
+    font-size: 1.2rem;
+  }
+
+  .isolated-banner-hint {
+    font-size: 0.72rem;
+    margin-bottom: 10px;
+  }
+
+  /* Quiz Panel on Mobile */
+  .quiz-panel {
+    width: calc(100vw - 24px);
+    max-width: 360px;
+    bottom: 12px;
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .quiz-target {
+    font-size: 1.35rem;
+    margin: 6px 0;
+  }
+
+  /* Pan & Zoom Controls on Mobile */
+  .pan-controls {
+    right: 12px;
+    bottom: 135px;
+    gap: 3px;
+  }
+
+  .zoom-controls {
+    right: 12px;
+    bottom: 60px;
+    gap: 3px;
+  }
+
+  .pan-btn, .zoom-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+
+  .bone-hover-tooltip {
+    display: none !important;
+  }
+
+  .zoom-hint {
+    display: none !important;
+  }
+}
+
+/* Extra Small Phones (<= 480px) */
+@media (max-width: 480px) {
+  .logo h1 {
+    font-size: 1rem;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .nav-pill {
+    padding: 5px 8px;
+    font-size: 0.72rem;
+  }
+
+  .side-panel-area {
+    max-height: 58vh;
+    padding: 10px 12px 20px;
+  }
+
+  .panel-bone-name {
+    font-size: 1.15rem;
+  }
+
+  .nepali-badge {
+    padding: 6px 10px;
+  }
+
+  .fun-fact-box {
+    padding: 10px;
+  }
+
+  .isolated-mode-banner {
+    top: 54px;
+    left: 8px;
+    right: 8px;
+    padding: 12px;
+  }
 }
