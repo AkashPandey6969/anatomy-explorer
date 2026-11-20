@@ -22,12 +22,31 @@ type FetchState = 'idle' | 'loading' | 'found' | 'not_found' | 'error';
 
 // ─── Fetch hook ───────────────────────────────────────────────────────────────
 
-function useBoneData(meshId: string | null) {
+function useBoneData(meshId: string | null, allBones: BoneData[]) {
   const [state, setState] = useState<FetchState>('idle');
   const [data, setData] = useState<BoneData | null>(null);
 
   useEffect(() => {
-    if (!meshId) { setState('idle'); setData(null); return; }
+    if (!meshId) {
+      setState('idle');
+      setData(null);
+      return;
+    }
+
+    // Fast-path: Instant in-memory lookup from pre-fetched allBones (0ms latency!)
+    const cleanId = meshId.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase();
+    const localMatch = allBones.find(b => {
+      const bClean = b.mesh_id.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase();
+      return b.mesh_id === meshId || bClean === cleanId || b.common_name.toLowerCase() === cleanId || bClean.includes(cleanId) || cleanId.includes(bClean);
+    });
+
+    if (localMatch) {
+      setData(localMatch);
+      setState('found');
+      return;
+    }
+
+    // Fallback: Fetch from backend API if not in memory
     setState('loading');
     setData(null);
 
@@ -44,7 +63,7 @@ function useBoneData(meshId: string | null) {
       .catch(err => { if (err.name !== 'AbortError') setState('error'); });
 
     return () => controller.abort();
-  }, [meshId]);
+  }, [meshId, allBones]);
 
   return { state, data };
 }
@@ -182,6 +201,11 @@ function IsolatedBoneModel({ selectedId }: { selectedId: string }) {
         metalness: 0.1,
       });
       group.add(clonedMesh);
+    } else {
+      // Safe fallback box to prevent Bounds from computing NaN/Infinity on empty group
+      const fallbackGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+      const fallbackMat = new THREE.MeshStandardMaterial({ color: '#6366f1', wireframe: true });
+      group.add(new THREE.Mesh(fallbackGeo, fallbackMat));
     }
     return group;
   }, [scene, selectedId]);
@@ -196,11 +220,15 @@ function InfoPanel({
   data,
   selectedId,
   onClose,
+  onInspect3D,
+  viewMode,
 }: {
   fetchState: FetchState;
   data: BoneData | null;
   selectedId: string | null;
   onClose: () => void;
+  onInspect3D: () => void;
+  viewMode: 'skeleton' | 'isolated' | 'quiz';
 }) {
   if (!selectedId) {
     return null;
@@ -220,7 +248,8 @@ function InfoPanel({
   if (fetchState === 'not_found' || fetchState === 'error') {
     return (
       <div className="info-panel">
-        <div className="panel-not-found">
+        <div className="panel-not-found" style={{ position: 'relative' }}>
+          <button className="panel-close-btn" onClick={onClose} title="Close">✕</button>
           <div className="not-found-icon">🔍</div>
           <div className="not-found-title">No data for this bone yet</div>
           <div className="not-found-mesh">Mesh ID: {selectedId}</div>
@@ -236,7 +265,8 @@ function InfoPanel({
   if (fetchState === 'found' && data) {
     return (
       <div className="info-panel">
-        <div className="panel-header">
+        <div className="panel-header" style={{ position: 'relative' }}>
+          <button className="panel-close-btn" onClick={onClose} title="Close panel">✕</button>
           <div className="panel-system-tag">
             🦴 {data.system || 'Skeletal System'}
           </div>
@@ -265,6 +295,11 @@ function InfoPanel({
             </div>
           )}
 
+          {viewMode !== 'isolated' && (
+            <button className="inspect-bone-btn" onClick={onInspect3D}>
+              🔬 Inspect in 3D Isolation
+            </button>
+          )}
         </div>
       </div>
     );
@@ -447,7 +482,7 @@ export default function App() {
     setWrongClickId(null);
   }, []);
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
-  const { state: fetchState, data: boneData } = useBoneData(selectedId);
+  const { state: fetchState, data: boneData } = useBoneData(selectedId, allBones);
 
   const handleBoneClick = useCallback((id: string) => {
     if (viewMode === 'quiz') {
@@ -476,22 +511,21 @@ export default function App() {
       return;
     }
 
-    if (viewMode === 'skeleton') {
-      if (selectedId === id) {
-        setViewMode('isolated');
-      } else {
-        setSelectedId(id);
-      }
-    } else {
-      setSelectedId(id);
+    // Normal exploration: simply select the bone
+    setSelectedId(id);
+  }, [viewMode, quizTarget, nextQuizQuestion, quizFeedback]);
+
+  const handleInspect3D = useCallback(() => {
+    if (selectedId) {
       setViewMode('isolated');
     }
-  }, [viewMode, quizTarget, nextQuizQuestion, quizFeedback, selectedId]);
+  }, [selectedId]);
 
-  const handleBack = useCallback(() => {
-    setViewMode('skeleton');
+  const handleClosePanel = useCallback(() => {
     setSelectedId(null);
-
+    if (viewMode === 'isolated') {
+      setViewMode('skeleton');
+    }
     if (controlsRef.current) {
       const controls = controlsRef.current;
       controls.target.set(0, 0, 0);
@@ -499,7 +533,7 @@ export default function App() {
       camera.position.set(0, 0.2, 3.5);
       controls.update();
     }
-  }, []);
+  }, [viewMode]);
 
   const handleBoneHover = useCallback((name: string | null) => {
     setHoveredBone(name);
@@ -577,6 +611,11 @@ export default function App() {
             shadows
             camera={{ position: [0, 0.2, 3.5], fov: 45, near: 0.001, far: 200 }}
             gl={{ antialias: true, alpha: false }}
+            onPointerMissed={() => {
+              if (viewMode === 'skeleton') {
+                setSelectedId(null);
+              }
+            }}
           >
             <React.Suspense fallback={
               <Html center>
@@ -668,7 +707,7 @@ export default function App() {
               <h1>Anatomy <span>Explorer</span></h1>
             </div>
             {viewMode === 'isolated' ? (
-              <button className="nav-pill active" onClick={handleBack} style={{ fontSize: '1rem', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button className="nav-pill active" onClick={handleClosePanel} style={{ fontSize: '1rem', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span>←</span> Back to Skeleton
               </button>
             ) : (
@@ -713,7 +752,9 @@ export default function App() {
             fetchState={fetchState}
             data={boneData}
             selectedId={selectedId}
-            onClose={handleBack}
+            onClose={handleClosePanel}
+            onInspect3D={handleInspect3D}
+            viewMode={viewMode}
           />
         </div>
       )}
