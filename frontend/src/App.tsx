@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, useGLTF, Html, Environment, Bounds } from '@react-three/drei';
+import { OrbitControls, useGLTF, Html, Environment } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import './App.css';
@@ -163,47 +163,67 @@ function IsolatedBoneModel({ selectedId }: { selectedId: string }) {
   
   const isolatedGroup = React.useMemo(() => {
     let targetMesh: THREE.Mesh | null = null;
-    const normalizedSelectedId = selectedId.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase();
+    const cleanId = selectedId.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').trim().toLowerCase();
 
+    // Priority 1: Exact match on mesh name or normalized ID
     scene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const normalizedChildName = child.name.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').toLowerCase();
-        if (child.name === selectedId || normalizedChildName === normalizedSelectedId || child.name.replace(/_/g, ' ').toLowerCase().includes(normalizedSelectedId)) {
-          console.log("MATCH FOUND:", child.name, "for selectedId:", selectedId);
+      if ((child as THREE.Mesh).isMesh && !targetMesh) {
+        const childClean = child.name.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').trim().toLowerCase();
+        if (child.name.toLowerCase() === selectedId.toLowerCase() || childClean === cleanId) {
           targetMesh = child as THREE.Mesh;
         }
       }
     });
 
+    // Priority 2: Substring / keyword boundary match
     if (!targetMesh) {
-      console.warn("NO MATCH FOUND FOR:", selectedId, "normalized as:", normalizedSelectedId);
-      // Just to debug, list a few mesh names to see what they look like
-      let sampleMeshes: string[] = [];
-      scene.traverse(c => {
-        if ((c as THREE.Mesh).isMesh && sampleMeshes.length < 5) sampleMeshes.push(c.name);
+      scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh && !targetMesh) {
+          const childClean = child.name.replace(/_[a-zA-Z]+_\d+$/, '').replace(/__\d+$/, '').replace(/_/g, ' ').trim().toLowerCase();
+          if (childClean.includes(cleanId) || cleanId.includes(childClean)) {
+            targetMesh = child as THREE.Mesh;
+          }
+        }
       });
-      console.log("Sample meshes in scene:", sampleMeshes);
     }
 
     const group = new THREE.Group();
     if (targetMesh !== null) {
       const mesh = targetMesh as THREE.Mesh;
       const clonedMesh = mesh.clone();
-      clonedMesh.geometry = mesh.geometry.clone();
-      clonedMesh.geometry.center(); // Center the geometry locally
+      const geom = mesh.geometry.clone();
+      
+      // Compute bounding box and dimensions before centering
+      geom.computeBoundingBox();
+      const box = geom.boundingBox || new THREE.Box3();
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      
+      // Center geometry around [0, 0, 0]
+      geom.center();
+      clonedMesh.geometry = geom;
+
+      // Auto-scale so bone fills the viewport at perfect inspection size (2.2 units)
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const targetSize = 2.2;
+      const scaleFactor = maxDim > 0 ? targetSize / maxDim : 1.0;
+
+      clonedMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
       clonedMesh.position.set(0, 0, 0);
       clonedMesh.rotation.set(0, 0, 0);
-      clonedMesh.scale.set(1, 1, 1);
-      
+
+      // Realistic anatomical bone shader with double-sided rendering for hollow landmarks
       clonedMesh.material = new THREE.MeshStandardMaterial({
-        color: '#e8edf5',
-        roughness: 0.3,
-        metalness: 0.1,
+        color: '#f4efe6',
+        roughness: 0.35,
+        metalness: 0.05,
+        side: THREE.DoubleSide,
       });
+
       group.add(clonedMesh);
     } else {
-      // Safe fallback box to prevent Bounds from computing NaN/Infinity on empty group
-      const fallbackGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+      // Safe fallback box to prevent any empty group
+      const fallbackGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
       const fallbackMat = new THREE.MeshStandardMaterial({ color: '#6366f1', wireframe: true });
       group.add(new THREE.Mesh(fallbackGeo, fallbackMat));
     }
@@ -427,9 +447,16 @@ function IsolatedScene({
   selectedId: string;
 }) {
   return (
-    <Bounds fit observe margin={1.4}>
+    <>
+      <ambientLight intensity={0.65} />
+      <directionalLight position={[4, 5, 4]} intensity={1.8} castShadow />
+      <directionalLight position={[-4, 2, -2]} intensity={0.7} color="#a5b4fc" />
+      <directionalLight position={[0, -3, 3]} intensity={0.4} color="#e2e8f0" />
+      <directionalLight position={[0, 4, -4]} intensity={0.6} color="#ffffff" />
+      <pointLight position={[0, 2, 3]} intensity={0.6} color="#60a5fa" />
+
       <IsolatedBoneModel selectedId={selectedId} />
-    </Bounds>
+    </>
   );
 }
 
@@ -503,6 +530,17 @@ export default function App() {
   const handleInspect3D = useCallback(() => {
     if (selectedId) {
       setViewMode('isolated');
+      if (controlsRef.current) {
+        const controls = controlsRef.current;
+        controls.target.set(0, 0, 0);
+        const camera = controls.object as THREE.PerspectiveCamera;
+        camera.near = 0.01;
+        camera.far = 100;
+        camera.zoom = 1;
+        camera.position.set(0, 0.4, 3.2);
+        camera.updateProjectionMatrix();
+        controls.update();
+      }
     }
   }, [selectedId]);
 
@@ -663,8 +701,10 @@ export default function App() {
               enablePan
               panSpeed={1.0}
               zoomSpeed={1.5}
-              minDistance={viewMode !== 'isolated' ? 0.08 : 0.03}
-              maxDistance={viewMode !== 'isolated' ? 8 : 10}
+              autoRotate={viewMode === 'isolated'}
+              autoRotateSpeed={1.0}
+              minDistance={0.1}
+              maxDistance={15}
               minPolarAngle={0}
               maxPolarAngle={Math.PI}
               enableDamping
@@ -680,6 +720,24 @@ export default function App() {
         </div>
 
         {viewMode !== 'isolated' && <SearchBar bones={allBones} onSelect={handleBoneClick} />}
+        
+        {/* Floating banner when in 3D Isolated mode */}
+        {viewMode === 'isolated' && boneData && (
+          <div className="isolated-mode-banner">
+            <div className="isolated-banner-badge">🔬 3D Inspection Mode</div>
+            <h2 className="isolated-banner-title">{boneData.common_name}</h2>
+            {boneData.latin_name && <p className="isolated-banner-latin">{boneData.latin_name}</p>}
+            {boneData.nepali_name && (
+              <span className="isolated-banner-nepali">{boneData.nepali_name}</span>
+            )}
+            <div className="isolated-banner-hint">
+              Drag to rotate 360° · Scroll to zoom · Auto-turntable active
+            </div>
+            <button className="isolated-back-btn" onClick={handleClosePanel}>
+              ← Back to Full Skeleton
+            </button>
+          </div>
+        )}
         
         {viewMode === 'quiz' && (
           <QuizPanel 
