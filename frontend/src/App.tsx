@@ -417,15 +417,7 @@ function SkeletonScene({
   onBoneHover: (name: string | null) => void;
 }) {
   return (
-    <>
-      <Environment preset="city" />
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[3, 5, 3]} intensity={1.2} castShadow />
-      <directionalLight position={[-3, 2, -3]} intensity={0.4} color="#4f6ef7" />
-      <pointLight position={[0, 2, 2]} intensity={0.5} color="#60a5fa" />
-
-      <SkeletonModel onBoneClick={onBoneClick} selectedId={selectedId} wrongId={wrongId} onBoneHover={onBoneHover} />
-    </>
+    <SkeletonModel onBoneClick={onBoneClick} selectedId={selectedId} wrongId={wrongId} onBoneHover={onBoneHover} />
   );
 }
 
@@ -435,16 +427,9 @@ function IsolatedScene({
   selectedId: string;
 }) {
   return (
-    <>
-      <Environment preset="city" />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
-      <directionalLight position={[-5, 2, -5]} intensity={0.5} color="#4f6ef7" />
-      
-      <Bounds fit clip observe margin={1.2}>
-        <IsolatedBoneModel selectedId={selectedId} />
-      </Bounds>
-    </>
+    <Bounds fit observe margin={1.4}>
+      <IsolatedBoneModel selectedId={selectedId} />
+    </Bounds>
   );
 }
 
@@ -528,9 +513,13 @@ export default function App() {
     }
     if (controlsRef.current) {
       const controls = controlsRef.current;
-      controls.target.set(0, 0, 0);
       const camera = controls.object as THREE.PerspectiveCamera;
+      camera.near = 0.001;
+      camera.far = 200;
+      camera.zoom = 1;
       camera.position.set(0, 0.2, 3.5);
+      camera.updateProjectionMatrix();
+      controls.target.set(0, 0, 0);
       controls.update();
     }
   }, [viewMode]);
@@ -617,6 +606,12 @@ export default function App() {
               }
             }}
           >
+            <Environment preset="city" />
+            <ambientLight intensity={0.5} />
+            <directionalLight position={[3, 5, 3]} intensity={1.3} castShadow />
+            <directionalLight position={[-3, 2, -3]} intensity={0.4} color="#4f6ef7" />
+            <pointLight position={[0, 2, 2]} intensity={0.5} color="#60a5fa" />
+
             <React.Suspense fallback={
               <Html center>
                 <div style={{
@@ -642,15 +637,17 @@ export default function App() {
                 </div>
               </Html>
             }>
-              {viewMode !== 'isolated' ? (
+              <group visible={viewMode !== 'isolated'}>
                 <SkeletonScene
                   selectedId={viewMode === 'quiz' ? null : selectedId}
                   wrongId={wrongClickId}
                   onBoneClick={handleBoneClick}
                   onBoneHover={handleBoneHover}
                 />
-              ) : (
-                <IsolatedScene selectedId={selectedId!} />
+              </group>
+
+              {viewMode === 'isolated' && selectedId && (
+                <IsolatedScene selectedId={selectedId} />
               )}
             </React.Suspense>
 
